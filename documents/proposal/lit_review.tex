@@ -19,7 +19,9 @@ This document is for writing about the papers we find. Currently the plan is to 
 \end{abstract}
 
 \section{Questions}
-We want lane-keeping for boats. Are we doing sailboats or motorboats?
+We want lane-keeping for boats. Are we doing sailboats or motorboats? It looks like motorboats are already kind of understood. I'm not exactly sure where we can contribute. Sailboats seem a lot more recent.
+
+
 \section{Glossary}
 \begin{itemize}
     \item USV (unmanned surface vehicles)
@@ -33,18 +35,23 @@ We want lane-keeping for boats. Are we doing sailboats or motorboats?
 
 
 \subsection{Dynamic simulation model for an autonomous sailboat}
-\cite{Buehler2018} This paper derives a dynamic model for a sailboat. There is a \href{https://github.com/simonkohaut/stda-sailboat-simulator/tree/master/src}{GitHub repo} with their Python simulation.
+
 
 
 \section{Control}
-\cite{Nan2020} Uses robust PID control of unknown USVs. So robust control with uncertainties.
+\cite{Nan2020} Data-driven robust PID control of unknown USVs*. Uses robust PID control of unknown USVs. So robust control with uncertainties.
+
 \cite{Tan2010} Criteria and rule based obstacle avoidance for USVs explains some path-planning for boats. Splits the process into two parts: a big plan and then a local plan. It explicitly mentions lane keeping.
+
+\cite{Yu2010} Robust path following control of an unmanned boat. They do an experiment to verify that their mixed \(\mathrm{H}_\infty / \mathrm{H}_2\) based control works. IDK what that is. Maybe look for a follow up because the conclusion says they're going to get multi-USV control working. That was back in 2010.
+
 \section{Navigation}
 
 \section{Models}
 \cite{Huang2017} Tries to figure out how close a boat model is from reality. Inconclusive, they only do preliminary work. Further work could be done, but it probably requires a real life boat.
 
-\cite{Setiawan2020} Tries to make a dynamic model of autonomous sailboat.
+\cite{Setiawan2020} Development of Dynamic Model of Autonomous Sailboat for Simulation and Control. Tries to make a dynamic model of autonomous sailboat. Might want to contrast with \cite{Buehler2018}.
+\cite{Buehler2018} Dynamic simulation model for an autonomous sailboat. This paper derives a dynamic model for a sailboat. There is a \href{https://github.com/simonkohaut/stda-sailboat-simulator/tree/master/src}{GitHub repo} with their Python simulation.
 \bibliographystyle{IEEEtran}
 \bibliography{refs.bib}
 
