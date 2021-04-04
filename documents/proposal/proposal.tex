@@ -6,6 +6,8 @@
 \RequirePackage{textcomp}
 \RequirePackage{xcolor}
 \RequirePackage{hyperref}
+\RequirePackage{csquotes}
+\setkeys{Gin}{width=0.4\textwidth}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -14,7 +16,8 @@
 \maketitle
 
 
-\begin{abstract} In this paper, we investigate algorithms that perform two-view and multi-view feature matching and reconstruction. The algorithms, namely the eight-point algorithm, the factorization algorithm, and the two-view triangulation as in \cite{ma2012invitation}. Data points from image sets depicting a city and house are used. The reconstructions after applying the algorithms are re-projected onto the original image/model and a re-projection error is calculated to evaluate performance. We found best performance with the two-view 8-point algorithm with a re-projection error of 4, while the four-view reconstruction had an error of 1624. In other words, least error was observed in two-view reconstruction, while most error was observed in multi-view reconstruction.
+\begin{abstract}
+We're going to do some controls
 \end{abstract}
 
 
@@ -31,14 +34,20 @@ Boat stuck.
     \includegraphics{documents/proposal/Suez_Canal_blocked_by_Ever_Given_March_27_2021.jpg}
     \caption{Boat stuck\label{fig:boat_stuck}}
 \end{figure}
-Control and safety of automobiles is an area of intense research focus. We want to tackle a 
+Control and safety of automobiles is an area of intense research focus. We want to try applying the same techniques to a different system: autonomous boats, or in engineering terms, \enquote{Unmanned Surface Vehicles}.
 \section{Proposed Methodology}
-
+We plan to use simulation to quantify the performance of our control scheme. We will examine literature in USV's.
 \section{Related Work}
+There is already work in the area of of USV's.
+
+\cite{Setiawan2020} and \cite{Buehler2018} develop a dynamic models of an autonomous sailboats, though they do not go into the application of controls.
+
+
+
 
 \section{Experimental Plan}
-
+Using a dynamic model as that proposed in \cite{Buehler2018}, we will simulate and analyze the performance of our control scheme. 
 
 \bibliographystyle{IEEEtran}
-\bibliography{../lit_review/refs.bib}
+\bibliography{refs.bib}
 \end{document}
