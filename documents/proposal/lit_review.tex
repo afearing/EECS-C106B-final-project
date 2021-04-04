@@ -21,7 +21,14 @@ This document is for writing about the papers we find. Currently the plan is to 
 \section{Questions}
 We want lane-keeping for boats. Are we doing sailboats or motorboats? It looks like motorboats are already kind of understood. I'm not exactly sure where we can contribute. Sailboats seem a lot more recent.
 
-
+We need to figure out when a sailboat is controllable
+\section{Search terms}
+\begin{itemize}
+    \item USV
+    \item underactuated
+    \item sailboat
+    \item 
+\end{itemize}
 \section{Glossary}
 \begin{itemize}
     \item USV (unmanned surface vehicles)
@@ -29,7 +36,7 @@ We want lane-keeping for boats. Are we doing sailboats or motorboats? It looks l
     \item underactuated vs. fully-actuated. I believe this refers to if we can go in an arbitrary direction  \href{https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-832-underactuated-robotics-spring-2009/readings/MIT6_832s09_read_ch01.pdf}{source}
 \end{itemize}
 
-\section{Control}
+\section{Control/Path Planning}
 \cite{Nan2020} Data-driven robust PID control of unknown USVs*. Uses robust PID control of unknown USVs. So robust control with uncertainties.
 
 \cite{Tan2010} Criteria and rule based obstacle avoidance for USVs explains some path-planning for boats. Splits the process into two parts: a big plan and then a local plan. It explicitly mentions lane keeping.
@@ -38,10 +45,14 @@ We want lane-keeping for boats. Are we doing sailboats or motorboats? It looks l
 
 \cite{Dai2017} Leader-Follower Formation Control of USVs with Prescribed Performance and Collision Avoidance. This paper deals with fully actuated boats.
 
+\cite{Velueta2019} A Strategy of Robust Control for the Dynamics of an Unmanned Surface Vehicle under Marine Waves and Currents. Uses sliding mode control. Probably a motorboat. 
+
+\cite{HelmiAbrougui2019} Autopilot Design for an Autonomous Sailboat Based on Sliding Mode Control. Catamaran sailboat, 4 DOF model, only wind, no water disturbances. Feedback linearization for control.
 
 \section{Navigation}
 \cite{Vaneck1997} Fuzzy Guidance Controller for an Autonomous Boat. An old paper on waypoint following.
 
+ 
 
 \section{Models}
 \cite{Huang2017} Tries to figure out how close a boat model is from reality. Inconclusive, they only do preliminary work. Further work could be done, but it probably requires a real life boat.
@@ -53,6 +64,9 @@ We want lane-keeping for boats. Are we doing sailboats or motorboats? It looks l
 \cite{Paravisi2019} Unmanned Surface Vehicle Simulator with Realistic Environmental Disturbances. A paper on a ROS Kinetic simulator they made. It does currents and different boat types. There is a \href{https://github.com/disaster-robotics-proalertas/usv_sim_lsa}{GitHub repo}.
 
 \cite{Setiawan2020} Experimental Study on the Aerodynamic Performance of Autonomous Boat with Wind Propulsion and Solar Power. From the same author who developed the dynamic model. Experimental results. Really over my head because it has to do with aerodynamics.
+
+
+\cite{Sauzé2006} 
 
 \section{Notes}
 It looks like control of sailboats is the newest thing. Robust control of fully-actuated USV's has been kind of done. So sailboats is where we can contribute without too high a bar of entry. One of the big hold ups is accurate simulation. It seems like the literature is just guessing what dynamic models fit the reality. Not even counting wind.
