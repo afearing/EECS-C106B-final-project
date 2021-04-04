@@ -1,38 +1,18 @@
-\documentclass[journal]{IEEEtran}
-% \RequirePackage[utf8]{inputenc}
-\RequirePackage{hyperref}
-% \RequirePackage{caption}
-\RequirePackage{cite}% use this because it works properly with IEEE
-\RequirePackage{amsmath}
-\RequirePackage{amsfonts}
-\RequirePackage{amssymb}
-\RequirePackage{physics}
-\RequirePackage{siunitx}
-\RequirePackage{url}
-\RequirePackage{listings}
+\documentclass[conference]{IEEEtran}
+\RequirePackage{cite}
+\RequirePackage{amsmath,amssymb,amsfonts}
+\RequirePackage{algorithmic}
 \RequirePackage{graphicx}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage[ruled,vlined]{algorithm2e}
-
-\setkeys{Gin}{width=3in}
-\graphicspath{{./figures/}}
-\RequirePackage{bm}
-\RequirePackage{float}
-\RequirePackage{cancel}
-\usepackage[normalem]{ulem}
-
-% \RequirePackage[framed,numbered,autolinebreaks,useliterate]{mcode}
-\RequirePackage{metalogo} % \LaTeX logo
-
+\RequirePackage{textcomp}
+\RequirePackage{xcolor}
+\RequirePackage{hyperref}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 \title{EECS 106B Final Project Proposal}
 \author{Andrew~Fearing, Neelay~Junnarkar,  Hamza~Kamran~Khawaja}
 \maketitle
 
-% argument is your BibTeX string definitions and bibliography database(s)
-\bibliographystyle{IEEEtran}
-\bibliography{biblio.bib}
 
 \begin{abstract} In this paper, we investigate algorithms that perform two-view and multi-view feature matching and reconstruction. The algorithms, namely the eight-point algorithm, the factorization algorithm, and the two-view triangulation as in \cite{ma2012invitation}. Data points from image sets depicting a city and house are used. The reconstructions after applying the algorithms are re-projected onto the original image/model and a re-projection error is calculated to evaluate performance. We found best performance with the two-view 8-point algorithm with a re-projection error of 4, while the four-view reconstruction had an error of 1624. In other words, least error was observed in two-view reconstruction, while most error was observed in multi-view reconstruction.
 \end{abstract}
