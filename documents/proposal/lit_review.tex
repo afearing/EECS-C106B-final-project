@@ -29,15 +29,6 @@ We want lane-keeping for boats. Are we doing sailboats or motorboats? It looks l
     \item underactuated vs. fully-actuated. I believe this refers to if we can go in an arbitrary direction  \href{https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-832-underactuated-robotics-spring-2009/readings/MIT6_832s09_read_ch01.pdf}{source}
 \end{itemize}
 
-\section{Papers}
-\subsection{Fuzzy Guidance Controller for an Autonomous Boat}
-\cite{Vaneck1997} An old paper on waypoint following.
-
-
-\subsection{Dynamic simulation model for an autonomous sailboat}
-
-
-
 \section{Control}
 \cite{Nan2020} Data-driven robust PID control of unknown USVs*. Uses robust PID control of unknown USVs. So robust control with uncertainties.
 
@@ -45,13 +36,25 @@ We want lane-keeping for boats. Are we doing sailboats or motorboats? It looks l
 
 \cite{Yu2010} Robust path following control of an unmanned boat. They do an experiment to verify that their mixed \(\mathrm{H}_\infty / \mathrm{H}_2\) based control works. IDK what that is. Maybe look for a follow up because the conclusion says they're going to get multi-USV control working. That was back in 2010.
 
+\cite{Dai2017} Leader-Follower Formation Control of USVs with Prescribed Performance and Collision Avoidance. This paper deals with fully 
+
+
 \section{Navigation}
+\cite{Vaneck1997} Fuzzy Guidance Controller for an Autonomous Boat. An old paper on waypoint following.
+
 
 \section{Models}
 \cite{Huang2017} Tries to figure out how close a boat model is from reality. Inconclusive, they only do preliminary work. Further work could be done, but it probably requires a real life boat.
 
 \cite{Setiawan2020} Development of Dynamic Model of Autonomous Sailboat for Simulation and Control. Tries to make a dynamic model of autonomous sailboat. Might want to contrast with \cite{Buehler2018}.
 \cite{Buehler2018} Dynamic simulation model for an autonomous sailboat. This paper derives a dynamic model for a sailboat. There is a \href{https://github.com/simonkohaut/stda-sailboat-simulator/tree/master/src}{GitHub repo} with their Python simulation.
+
+\cite{Paravisi2019} Unmanned Surface Vehicle Simulator with Realistic Environmental Disturbances. A paper on a ROS Kinetic simulator they made. It does currents and different boat types. There is a \href{https://github.com/disaster-robotics-proalertas/usv_sim_lsa}{GitHub repo}.
+
+\cite{Setiawan2020} Experimental Study on the Aerodynamic Performance of Autonomous Boat with Wind Propulsion and Solar Power. From the same author who developed the dynamic model. Experimental results. Really over my head because it has to do with aerodynamics.
+
+\section{Notes}
+It looks like control of sailboats is the newest thing. Robust control of fully-actuated USV's has been kind of done. So sailboats is where we can contribute without too high a bar of entry. One of the big hold ups is accurate simulation. It seems like the literature is just guessing what dynamic models fit the reality. Not even counting wind.
 \bibliographystyle{IEEEtran}
 \bibliography{refs.bib}
 
