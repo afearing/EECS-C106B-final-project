@@ -6,6 +6,7 @@
 \RequirePackage{textcomp}
 \RequirePackage{xcolor}
 \RequirePackage{hyperref}
+\RequirePackage{csquotes}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -49,6 +50,13 @@ We need to figure out when a sailboat is controllable
 
 \cite{HelmiAbrougui2019} Autopilot Design for an Autonomous Sailboat Based on Sliding Mode Control. Catamaran sailboat, 4 DOF model, only wind, no water disturbances. Feedback linearization for control.
 
+\cite{Li2016} Fractional-Order PID Controller of USV Course-Keeping Using Hybrid GA-PSO Algorithm. Defines underactuated system. \enquote{In recent years, the maneuvering of underactuated surface vessels has become the focus of scholars’ attention. The underactuated system is a system that the number of control system input less than the freedom degrees of system. That means the spatial dimension of control input is less than spatial dimension of configuration. In USV control, when needing to rely on the rudder of transshipment torque and propeller longitudinal propulsion and controlling vessels in horizontal position and heading angle three degree of freedom motion, the USV control system belongs to the underactuated system.}
+
+
+
+\cite{}
+
+
 \section{Navigation}
 \cite{Vaneck1997} Fuzzy Guidance Controller for an Autonomous Boat. An old paper on waypoint following.
 
@@ -66,7 +74,13 @@ We need to figure out when a sailboat is controllable
 \cite{Setiawan2020} Experimental Study on the Aerodynamic Performance of Autonomous Boat with Wind Propulsion and Solar Power. From the same author who developed the dynamic model. Experimental results. Really over my head because it has to do with aerodynamics.
 
 
-\cite{Sauzé2006} Design of 
+\cite{Sauzé2006} Design and navigation of an autonomous sailboat. The authors create a sailboat model to hold a pre-determined compass course and to test the ability of the hull/sail design to cope with different points of sail.
+
+
+\cite{DosSantos2020} Performance Evaluation of Propulsion Control Techniques for Autonomous Sailboat. Proposes ways to measure the performance of autonomous sailboats. Includes refs to a bunch of papers on control of sailboats.
+
+\cite{Xiao2014} Modeling and nonlinear heading control of sailing yachts. This is pretty much what we want. Does a 4-DOF model of a sailboat. Good introduction surveys the problem.
+
 
 \section{Notes}
 It looks like control of sailboats is the newest thing. Robust control of fully-actuated USV's has been kind of done. So sailboats is where we can contribute without too high a bar of entry. One of the big hold ups is accurate simulation. It seems like the literature is just guessing what dynamic models fit the reality. Not even counting wind.
