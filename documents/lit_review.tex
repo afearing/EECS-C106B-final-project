@@ -28,13 +28,14 @@ We need to figure out when a sailboat is controllable
     \item USV
     \item underactuated
     \item sailboat
-    \item 
+    \item robotic sailboat
 \end{itemize}
 \section{Glossary}
 \begin{itemize}
     \item USV (unmanned surface vehicles)
     \item COLREGS are rules for avoiding collisions with boats
     \item underactuated vs. fully-actuated. I believe this refers to if we can go in an arbitrary direction  \href{https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-832-underactuated-robotics-spring-2009/readings/MIT6_832s09_read_ch01.pdf}{source}
+    \item SNAME = Society of Naval Architects and Marine Engineers
 \end{itemize}
 
 \section{Control/Path Planning}
@@ -54,15 +55,27 @@ We need to figure out when a sailboat is controllable
 
 
 
-\cite{}
-
-
 \section{Navigation}
 \cite{Vaneck1997} Fuzzy Guidance Controller for an Autonomous Boat. An old paper on waypoint following.
 
  
 
 \section{Models}
+\subsection{SAILBOT Autonomous Marine Robot of Eolic Propulsion} \cite{Alves2010}  A master's thesis on an autonomous sailboat. They start with a 6-DOF model and then simplify it down to a 3-DOF model by assuming waves negligible.
+\begin{figure}
+    \centering
+    \includegraphics{documents/figures/alves_sailboat.png}
+    \caption{Alves sailboat \cite{Alves2010}}
+    \label{fig:alves_sailboat}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics{}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+
+
 \cite{Huang2017} Tries to figure out how close a boat model is from reality. Inconclusive, they only do preliminary work. Further work could be done, but it probably requires a real life boat.
 
 \cite{Setiawan2020} Development of Dynamic Model of Autonomous Sailboat for Simulation and Control. Tries to make a dynamic model of autonomous sailboat. Might want to contrast with \cite{Buehler2018}. This is a 4-DOF model.
@@ -74,7 +87,7 @@ We need to figure out when a sailboat is controllable
 \cite{Setiawan2020} Experimental Study on the Aerodynamic Performance of Autonomous Boat with Wind Propulsion and Solar Power. From the same author who developed the dynamic model. Experimental results. Really over my head because it has to do with aerodynamics.
 
 
-\cite{Sauzé2006} Design and navigation of an autonomous sailboat. The authors create a sailboat model to hold a pre-determined compass course and to test the ability of the hull/sail design to cope with different points of sail.
+\cite{Sauze2006} Design and navigation of an autonomous sailboat. The authors create a sailboat model to hold a pre-determined compass course and to test the ability of the hull/sail design to cope with different points of sail.
 
 
 \cite{DosSantos2020} Performance Evaluation of Propulsion Control Techniques for Autonomous Sailboat. Proposes ways to measure the performance of autonomous sailboats. Includes refs to a bunch of papers on control of sailboats.
@@ -84,6 +97,15 @@ We need to figure out when a sailboat is controllable
 
 \section{Notes}
 It looks like control of sailboats is the newest thing. Robust control of fully-actuated USV's has been kind of done. So sailboats is where we can contribute without too high a bar of entry. One of the big hold ups is accurate simulation. It seems like the literature is just guessing what dynamic models fit the reality. Not even counting wind.
+
+\section{Roadmap}
+\begin{enumerate}
+    \item Replicate 3-DOF model from \cite{Alves2010}.
+    \item Use a controller to get this model through a channel.
+    \item Make it more complicated with a 4- or 6-DOF model from \cite{Buehler2018} or \cite{Setiawan2020}.
+    \item Add weather effects to taste. Maybe using \cite{Paravisi2019}.
+\end{enumerate}
+
 \bibliographystyle{IEEEtran}
 \bibliography{refs.bib}
 
