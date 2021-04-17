@@ -3,14 +3,18 @@
 FROM ros:kinetic-ros-base as kinetic-ros-base-apt-updated
 RUN apt-get update
 
-# install all the packages for ros
-FROM kinetic-ros-base-apt-updated as ros-w-usv-packages
+# install desktop-full because i know this stage should work
+FROM kinetic-ros-base-apt-updated as ros-kinetic-desktop-full
 RUN apt-get install -y --no-install-recommends \
-    ros-kinetic-desktop-full ros-kinetic-control-* ros-kinetic-osg-markers ros-kinetic-move-base
+    ros-kinetic-desktop-full
+    
+FROM ros-kinetic-desktop-full as ros-kinetic-usv-deps
+RUN apt-get install -y --no-install-recommends \
+     ros-kinetic-control-* ros-kinetic-osg-markers ros-kinetic-move-base
 RUN rosdep init && rosdep update
 RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && source ~/.bashrc
 
 # install all the python packages
-FROM ros-w-usv-packages as ros-w-python-packages
+FROM ros-kinetic-usv-deps as ros-w-python-packages
 RUN apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential python-rosdep python-wxtools python-lxml python-pathlib python-h5py python-scipy python-geolinks python-gdal \
 libfftw3-* libxml++2.6-* libsdl-image1.2-dev libsdl-dev
