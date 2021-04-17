@@ -1,0 +1,41 @@
+%% Requires compilation with XeLaTeX or LuaLaTeX
+%% based on UC Berkeley Beamer theme https://www.overleaf.com/latex/templates/uc-berkeley-beamer-theme/bywswngntrws
+\documentclass[10pt,xcolor={table,dvipsnames},t]{beamer}
+
+\usetheme{UCBerkeley}
+\setbeamertemplate{footline}[frame number] 
+\RequirePackage[style=numeric]{biblatex}
+\addbibresource{refs.bib}
+\RequirePackage{csquotes}
+\RequirePackage{amsmath}
+\RequirePackage{physics}
+\RequirePackage{graphicx}
+\RequirePackage[font=small]{caption, subcaption}
+\RequirePackage{wrapfig}
+\RequirePackage{siunitx}
+\RequirePackage{sidecap}
+\setkeys{Gin}{width=1\textwidth}
+
+
+\title[Autosailboat]{Autonomous control of a sailboat}
+\author{Neelay Junnarkar, Andrew Fearing, Hamza Khawaja}
+% \institute{Your Faculty/Department}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+ \tableofcontents
+\end{frame}
+
+
+\begin{frame}{References}
+    \printbibliography{}
+\end{frame}
+
+\end{document}
