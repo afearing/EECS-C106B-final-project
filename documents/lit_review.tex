@@ -7,6 +7,7 @@
 \RequirePackage{xcolor}
 \RequirePackage{hyperref}
 \RequirePackage{csquotes}
+\RequirePackage{listings}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -92,6 +93,11 @@ We need to figure out when a sailboat is controllable
 
 \section{Notes}
 It looks like control of sailboats is the newest thing. Robust control of fully-actuated USV's has been kind of done. So sailboats is where we can contribute without too high a bar of entry. One of the big hold ups is accurate simulation. It seems like the literature is just guessing what dynamic models fit the reality. Not even counting wind.
+
+
+\section{STDA Sailboat Simulator}
+This is the simulator form \cite{Buehler2018}. It prints out graphs and may be simpler to use at first. Use \lstinline{python run.py}. The package requires Python 2.7, so a conda environment YAML file is on our GitHub.
+
 
 \section{Roadmap}
 \begin{enumerate}
