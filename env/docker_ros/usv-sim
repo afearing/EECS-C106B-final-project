@@ -10,11 +10,15 @@ RUN apt-get install -y --no-install-recommends \
     
 FROM ros-kinetic-desktop-full as ros-kinetic-usv-deps
 RUN apt-get install -y --no-install-recommends \
-     ros-kinetic-control-* ros-kinetic-osg-markers ros-kinetic-move-base
-RUN rosdep init && rosdep update
-RUN echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && source ~/.bashrc
+     ros-kinetic-control-* ros-kinetic-osg-markers ros-kinetic-move-base \
+    && rm -rf /var/lib/apt/lists/*
+# RUN /bin/bash echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && /bin/bash source ~/.bashrc
 
 # install all the python packages
 FROM ros-kinetic-usv-deps as ros-w-python-packages
-RUN apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential python-rosdep python-wxtools python-lxml python-pathlib python-h5py python-scipy python-geolinks python-gdal \
-libfftw3-* libxml++2.6-* libsdl-image1.2-dev libsdl-dev
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \
+ python-rosinstall python-rosinstall-generator python-wstool build-essential python-rosdep python-wxtools python-lxml python-pathlib python-h5py python-scipy python-geolinks python-gdal
+RUN apt-get install -y --no-install-recommends \
+ libfftw3-* libxml++2.6-* libsdl-image1.2-dev libsdl-dev \
+&& rm -rf /var/lib/apt/lists/*
