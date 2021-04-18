@@ -1,0 +1,10 @@
+name: stda 
+channels:
+  - conda-forge
+  -  defaults
+dependencies:
+  - python=2.7
+  - numpy
+  - scipy
+  - pyyaml
+  - matplotlib 
