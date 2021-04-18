@@ -14,6 +14,8 @@
 \RequirePackage{wrapfig}
 \RequirePackage{siunitx}
 \RequirePackage{sidecap}
+\RequirePackage{caption}
+\captionsetup[figure]{font = scriptsize, labelfont = scriptsize} % https://tex.stackexchange.com/questions/52132/beamer-change-size-of-figure-caption
 \setkeys{Gin}{width=1\linewidth}
 
 
@@ -35,14 +37,41 @@
 \begin{frame}{Team}
 Us
 \end{frame}
-\begin{frame}{Frame Title}
+
+
+\begin{frame}{Motivation}
+
     \begin{figure}
         \centering
-        \includegraphics[width = 0.3\linewidth]{documents/figures/Suez_Canal_blocked_by_Ever_Given_March_27_2021.jpg}
+        \includegraphics[width=0.3\linewidth]{documents/figures/Suez_Canal_blocked_by_Ever_Given_March_27_2021.jpg}
         \caption{Boat stuck}
         \label{fig:boat_stuck}
-    \end{figure}
-    Sailboats
+    \end{figure}    
+\end{frame}
+\begin{frame}{Sailboats}
+\begin{columns}
+\column{0.4\linewidth}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.3\linewidth]{documents/figures/alves_sailboat.png}
+    \caption{Alves sailboat \cite{Alves2010}}
+    \label{fig:alves_sailboat}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{documents/figures/alves_modes.png}
+    \caption{Modes of sailing \cite{Alves2010}}
+    \label{fig:alves_modes}
+\end{figure}
+\column{0.4\linewidth}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{documents/figures/alves_vpp.png}
+    \caption{Velocity polar diagram \cite{Alves2010}}
+    \label{fig:alves_velocity}
+\end{figure}
+\end{columns}
 \end{frame}
 
 \section{Progress}
