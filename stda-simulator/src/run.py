@@ -62,7 +62,7 @@ def scenario_1(save=False):
     environment[SAIL_ANGLE] = 0. /180 * pi
     environment[RUDDER_ANGLE] = 0
     environment[WAVE] = Wave(50, 0, 0)
-    sim_wave = False
+    sim_wave = True
     if sim_wave:
         environment[WAVE] = Wave(length=100., amplitude=.5, direction=0)
         append = "_wave"
@@ -72,9 +72,9 @@ def scenario_1(save=False):
     environment[TRUE_WIND] = wind
     
     # simulation params
-    t_end = 150.
+    t_end = 300.
     #t_end = 57.
-    sampletime = .3
+    sampletime = .1
     sail_sampletime = 2.
     N_steps = int(t_end / sampletime)
     # initial values
