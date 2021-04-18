@@ -1,0 +1,16 @@
+FROM osrf/ros:kinetic-desktop-full as kinetic-desktop-full-apt-updated
+RUN apt-get update
+
+FROM kinetic-desktop-full-apt-updated as ros-kinetic-boat-deps
+RUN apt-get install -y --no-install-recommends \
+     ros-kinetic-control-* ros-kinetic-osg-markers ros-kinetic-move-base \
+    && rm -rf /var/lib/apt/lists/*
+
+# install all the python packages
+FROM ros-kinetic-boat-deps as boat-w-python-packages
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \
+ python-rosinstall python-rosinstall-generator python-wstool build-essential python-rosdep python-wxtools python-lxml python-pathlib python-h5py python-scipy python-geolinks python-gdal
+RUN apt-get install -y --no-install-recommends \
+ libfftw3-* libxml++2.6-* libsdl-image1.2-dev libsdl-dev \
+&& rm -rf /var/lib/apt/lists/*
