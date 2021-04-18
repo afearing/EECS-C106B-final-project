@@ -8,8 +8,9 @@
             "name": "Python: sailing",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/run.py",
-            "console": "integratedTerminal"
+            "program": "${workspaceFolder}/stda-simulator/src/run.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/stda-simulator/src/"
         }
     ]
 }
