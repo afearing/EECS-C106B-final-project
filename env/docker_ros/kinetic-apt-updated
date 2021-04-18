@@ -1,6 +1,0 @@
-FROM ros:kinetic-ros-base as kinetic-ros-base-apt-updated
-RUN apt-get update
-
-FROM kinetic-ros-base-apt-updated
-RUN apt-get install -y --no-install-recommends \
-    ros-kinetic-desktop-full
