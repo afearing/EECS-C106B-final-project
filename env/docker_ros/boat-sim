@@ -25,16 +25,16 @@ RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
     mkdir -p ~/catkin_ws/src && \
     cd ~/catkin_ws/ && \
     catkin_make"
-FROM boat-catkin as boat-repod
-RUN /bin/bash -c "cd ~/catkin_ws/src && \
-    git clone https://github.com/disaster-robotics-proalertas/usv_sim_lsa.git && \
-    cd usv_sim_lsa && \
-    git submodule init && \
-    git submodule update"
-
-FROM boat-repod as boat-install
-RUN /bin/bash -c "cd ~/catkin_ws/src/usv_sim_lsa && \
-    ./install_usv_sim && \
-    cd ~/catkin_ws/ && \
-    catkin_make_isolated --install && \
-    source install_isolated/setup.bash"
+# FROM boat-catkin as boat-repod
+# RUN /bin/bash -c "cd ~/catkin_ws/src && \
+#     git clone https://github.com/disaster-robotics-proalertas/usv_sim_lsa.git && \
+#     cd usv_sim_lsa && \
+#     git submodule init && \
+#     git submodule update"
+# 
+# FROM boat-repod as boat-install
+# RUN /bin/bash -c "cd ~/catkin_ws/src/usv_sim_lsa && \
+#     ./install_usv_sim && \
+#     cd ~/catkin_ws/ && \
+#     catkin_make_isolated --install && \
+#     source install_isolated/setup.bash"
