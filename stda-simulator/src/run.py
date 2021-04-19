@@ -14,7 +14,6 @@ def main():
     #save=False
     
     scenario_1(save=save)
-    scenario_0(save=save)
     
     plt.show()
 
@@ -62,7 +61,7 @@ def scenario_1(save=False):
     environment[SAIL_ANGLE] = 0. /180 * pi
     environment[RUDDER_ANGLE] = 0
     environment[WAVE] = Wave(50, 0, 0)
-    sim_wave = True
+    sim_wave = False
     if sim_wave:
         environment[WAVE] = Wave(length=100., amplitude=.5, direction=0)
         append = "_wave"
@@ -72,7 +71,7 @@ def scenario_1(save=False):
     environment[TRUE_WIND] = wind
     
     # simulation params
-    t_end = 300.
+    t_end = 180.
     #t_end = 57.
     sampletime = .1
     sail_sampletime = 2.
@@ -105,42 +104,21 @@ def scenario_1(save=False):
     #ref_heading[:int(30/sampletime)] = -.2*pi*0
     
     
-    ref_heading[int(40/sampletime):] = 1.2*pi
+    ref_heading[int(40/sampletime):] = 0.5*pi# 1.2*pi
     
     #ref_heading[int(30/sampletime):int(33/sampletime)] = 0.8*pi
     #ref_heading[int(30/sampletime):] = .9*pi
     
-    ref_heading[int(90/sampletime) :] = .35 * pi
+    # ref_heading[int(90/sampletime) :] = 0.0 #0.35 * pi
     
     #ref_heading = smooth_reference(ref_heading, int(5/sampletime))
-    
-    def set_predefined_sail_angle():
-        predefined_sail_angle = ones(N_steps + 1)
-        predefined_sail_angle[:int(30/sampletime)] = 48*pi/180
-        #predefined_sail_angle[:int(10/sampletime)] = -65*pi/180
-        predefined_sail_angle[int(30/sampletime):] = 33*pi/180
-        predefined_sail_angle[int(30/sampletime):int(50/sampletime)] = 48*pi/180
-        predefined_sail_angle[int(48/sampletime):int(55/sampletime)] = 41*pi/180
-        
-        return predefined_sail_angle
-    
-    def set_predefined_sail_angle2():
-        predefined_sail_angle = ones(N_steps + 1)
-        predefined_sail_angle[:int(30/sampletime)] = 48*pi/180
-        #predefined_sail_angle[:int(10/sampletime)] = -65*pi/180
-        #predefined_sail_angle[int(30/sampletime):] = 33*pi/180
-        predefined_sail_angle[int(30/sampletime):int(50/sampletime)] = 48*pi/180
-        predefined_sail_angle[int(58/sampletime):] = 41*pi/180
-        
-        return predefined_sail_angle
+
     
     #sail_angle = set_predefined_sail_angle2()
     sail_angle = None
     
     x, t, separation, keel, sail_force, sail, r = simulate(N_steps, x, t, r, sail, environment, controller, 
                                                             integrator, sampletime, sail_sampletime, ref_heading, wind, sail_angle)
-    x2, t2, separation2, keel2, sail_force2, sail2, r2 = simulate(N_steps, x2, t2, r2, sail, environment, controller, 
-                                                            integrator2, sampletime, sail_sampletime, ref_heading, wind, sail_angle)
     
     #comp_route(x, x2)
     
@@ -189,7 +167,7 @@ def plots_manoevers(t, x, r, sail, ref_heading, save, sail_force=None, keel_forc
     #ax_traj.legend(['route', 'start', 'wind'])
     
     # heading plot
-    heading_data = [x[YAW, :] + 2*pi, ref_heading, arctan2(x[VEL_Y, :], x[VEL_X, :])]
+    heading_data = [x[YAW, :], ref_heading, arctan2(x[VEL_Y, :], x[VEL_X, :])]
     heading_labels = ['Heading', 'Reference', 'Drift']
     fig_heading, ax_heading = plot_time_fig(time=t, data=heading_data, labels=heading_labels, ax_labels=axlabels, scale=scale, ticks='ang')
     
