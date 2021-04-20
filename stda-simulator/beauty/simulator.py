@@ -11,13 +11,22 @@ from controller import *
 
 
 class Simulator:
-    def __init(self, sim_params):
+    def __init__(self, sim_params):
          for key, val in sim_params['simulator'].items():
             exec('self.' + key + '= val')
         self.environment_state = Environment(sim_params['environment'])
         self.boat = Boat(sim_params['boat'], self.environment_state)
-        self.N_steps = int(self.t_end * self.clockrate)
         self.controller = Controller(sim_params['controller'])
+
+
+        self.N_steps = int(self.t_end * self.clockrate)
+        # initialize data arrays. Might put these in boat but leave them in the Simulator class for now
+        self.x = np.zeros((14, self.N_steps + 1))
+        self.r = np.zeros(N_steps + 1)
+        self.sail = np.zeros(N_steps + 1)
+        self.t = np.zeros(N_steps + 1)
+        self.x[:, 0] = self.boat.get_state()
+        self.ref_heading = np.zeros(N_steps + 1)
         
 
     def simulate(self):
