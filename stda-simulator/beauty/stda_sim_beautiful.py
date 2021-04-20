@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import yaml
 import io
 import math
-
+from collections import namedtuple
 
 # notes on implementation
 # STATE = [x_pos, y_pos, z_pos, roll, pitch, yaw, x_vel, y_vel, z_vel, roll_rate, pitch_rate, yaw_rate, rudder_angle, sail_angle] in R^14. All SI units, radians
@@ -21,7 +21,54 @@ class Boat:
     def calculate_speed(self):
         return math.sqrt(self.vel_x**2 + self.vel_y**2)
 
+class WaveInfluence:
+    def __init__(self):
+        self.height = None
+        self.gradient_x = None
+        self.gradient_y = None
 
+    def calculate_wave_influence(self, boat, env):
+        ''' Calculate how the waves influence the boat. 
+        param time:     The simulation time [s]
+        return: The influence of the waves on the boat
+        '''
+        frequency = math.sqrt((2 * math.pi * env.gravity)) / env.wave_length
+
+        # wave vector components in cartesian coordinates
+        wave_x = 2*math.pi / env.wave_length * math.cos(env.wave_direction)
+        wave_y = 2*math.pi / env.wave_length * math.sin(env.wave_direction)
+        
+        factor = -env.wave_amplitude * math.cos(frequency * env.time - wave_x * boat.pos_x - wave_y * boat.pos_y)
+        gradient_x = wave_x * factor
+        gradient_y = wave_y * facto
+        self.height = env.wave_amplitude * math.sin(frequency * env.time - wave_x * boat.pos_x - wave_y * boat.pos_y)
+        self.gradient_x = gradient_x * math.cos(boat.yaw) + gradient_y * math.sin(boat.yaw)
+        self.gradient_y = gradient_y * math.cos(boat.yaw) - gradient_x * math.sin(boat.yaw)
+# 
+        return self.height, self.gradient_x, self.gradient_y
+
+
+class ApparentWind:
+    def __init__(self):
+        self.apparent_x      = None
+        self.apparent_y      = None
+        self.apparent_angle  = None
+        self.apparent_speed  = None
+
+    def calculate_apparent_wind(self, boat, env):
+        ''' Calculate the apparent wind on the boat. 
+
+        return: The apparent wind on the boat
+        '''
+        transformed_x = env.wind_x * math.cos(boat.yaw) + env.wind_y * math.sin(boat.yaw)
+        transformed_y = env.wind_x * -math.sin(boat.yaw) + env.wind_y * math.cos(boat.yaw)
+
+        self.apparent_x = transformed_x - boat.vel_x
+        self.apparent_y = transformed_y - boat.vel_y
+        self.apparent_angle = math.atan2(-apparent_y, -apparent_x)
+        self.apparent_speed = math.sqrt(apparent_x**2 + apparent_y**2)
+
+        return (self.apparent_x, self.apparent_y, self.apparent_angle, self.apparent_speed)
 class Environment:
     """The class for the environment and its properties. Note that this includes the boat dimensions"""
     def __init__(self, env_params):
@@ -50,6 +97,7 @@ class Environment:
         self.time = 0
         self.wind_x = self.wind_strength * math.cos(self.wind_direction)
         self.wind_y = self.wind_strength * math.sin(self.wind_direction)
+        
 
 def main():
     # simulation parameters. Set them here. We can change it to a yaml file to load later.
@@ -118,20 +166,35 @@ def calculate_apparent_wind(boat, env):
     apparent_angle = math.atan2(-apparent_y, -apparent_x)
     apparent_speed = math.sqrt(apparent_x**2 + apparent_y**2)
 
-    return (apparent_x, apparent_y, angle=apparent_angle, speed=apparent_speed)
+    return (apparent_x, apparent_y, apparent_angle, apparent_speed)
 
 def calculate_damping(boat, env):
     ''' Calculate the damping. 
     
     return: The amount of damping applied to the boat
     '''
-    return Damping(
-        x=DAMPING_INVARIANT_X * vel_x,
-        y=DAMPING_INVARIANT_Y * vel_y,
-        z=DAMPING_INVARIANT_Z * vel_z,
-        roll=DAMPING_INVARIANT_ROLL * roll_rate,
-        pitch=DAMPING_INVARIANT_PITCH * pitch_rate,
-        yaw=DAMPING_INVARIANT_YAW * yaw_rate)
+    return (env.damping_invariant_x *       boat.vel_x,
+            env.damping_invariant_y *       boat.vel_y,
+            env.damping_invariant_z *       boat.vel_z,
+            env.damping_invariant_roll *    boat.roll_rate,
+            env.damping_invariant_pitch *   boat.pitch_rate,
+            env.damping_invariant_yaw *     boat.yaw_rate)
+
+def calculate_hydrostatic_force(boat, env, wave_influence):
+    ''' Calculate the hydrostatic force. 
+
+    param wave_influence:   The influence of the waves on the boat     
+
+    return: The force applied on the boat by the waves
+    '''
+    force = env.hydrostatic_invariant_z * (boat.pos_z - wave_influence[0]) + GRAVITY_FORCE
+    
+    return (force * wave_influence[1],
+            force * wave_influence[2],
+            force),
+            (env.hydrostatic_eff_y * math.sin(boat.pitch + atan(wave_influence.gradient_x)), env.hydrostatic_eff_x * -sin(roll - atan(wave_influence.gradient_y)),)
+            
+
 
 
 
