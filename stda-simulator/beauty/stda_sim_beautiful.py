@@ -49,7 +49,7 @@ class WaveInfluence:
 
 
 class ApparentWind:
-    def __init__(self):
+    def __init__(self): # might change these to initialize in a sensible way
         self.apparent_x      = None
         self.apparent_y      = None
         self.apparent_angle  = None
@@ -69,6 +69,26 @@ class ApparentWind:
         self.apparent_speed = math.sqrt(apparent_x**2 + apparent_y**2)
 
         return (self.apparent_x, self.apparent_y, self.apparent_angle, self.apparent_speed)
+
+
+
+class Damping:
+    def __init__(self):
+        self.x      =     None
+        self.y      =     None
+        self.z      =     None
+        self.roll   =     None
+        self.pitch  =     None
+        self.yaw    =     None
+    def calculate_damping(self, boat, env):
+        self.x      = env.damping_invariant_x * boat.vel_x
+        self.y      = env.damping_invariant_y *       boat.vel_y
+        self.z      = env.damping_invariant_z *       boat.vel_z
+        self.roll   = env.damping_invariant_roll *    boat.roll_rate
+        self.pitch  = env.damping_invariant_pitch *   boat.pitch_rate
+        self.yaw    = env.damping_invariant_yaw *     boat.yaw_rate
+        return (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+
 class Environment:
     """The class for the environment and its properties. Note that this includes the boat dimensions"""
     def __init__(self, env_params):
@@ -79,6 +99,7 @@ class Environment:
         for key, val in env_params['boat_dimensions'].items():
             exec('self.' + key + '= val')
 
+        ###
         # Invariants
         self.wave_impedance_invariant = (self.water_density / 2) * self.lateral_area
         # Hydrostatic force
@@ -93,11 +114,21 @@ class Environment:
         self.damping_invariant_yaw    = -(self.moi_z / self.yaw_timeconstant)
         self.damping_invariant_pitch  = -2 * self.pitch_damping * math.sqrt(self.moi_y * self.mass * self.gravity * self.hydrostatic_eff_y)
         self.damping_invariant_roll   = -2 * self.roll_damping * math.sqrt(self.moi_x * self.mass * self.gravity * self.hydrostatic_eff_x)
-        
+        ###
         self.time = 0
         self.wind_x = self.wind_strength * math.cos(self.wind_direction)
         self.wind_y = self.wind_strength * math.sin(self.wind_direction)
+
+        self.wave_influence = WaveInfluence()
+        self.apparent_wind = ApparentWind()
+        self.damping = Damping()
         
+    def calculate_forces(self, boat):
+        self.wave_influence.calculate_wave_influence(boat, self)
+        self.damping.calculate_damping(boat, self)
+        self.apparent_wind.calculate_apparent_wind(boat, self)
+
+
 
 def main():
     # simulation parameters. Set them here. We can change it to a yaml file to load later.
@@ -120,13 +151,11 @@ def simulate(boat_state, environment_state, save = False):
 
 
 
-def solve(boat_state, boat_ref, environment_parameters):
+def solve(boat_state, boat_ref, env):
 
     # For force calulations needed values
-    speed = calculate_speed(boat_state)
-    wave_influence = calculate_wave_influence(time, boat_state, environment_parameters)
-    apparent_wind = calculate_apparent_wind(boat_state, environment_parameters)
-    
+    speed = boat_state.calculate_speed()
+    env.calculate_forces(boat)
     # Force calculation
 
 
