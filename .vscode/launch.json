@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/stda-simulator/src/run.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/stda-simulator/src/",
-            "python.pythonPath": "~/anaconda3/envs/stda/python.exe",
+             // "python": "~/anaconda3/envs/stda/python.exe", // appears to be bugged atm
         }
         {
             "name": "Python: sailing3",
@@ -20,7 +20,7 @@
             "program": "${workspaceFolder}/stda-simulator/src/stda_sim_beautiful.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/stda-simulator/src/",
-            "python.pythonPath": "~/anaconda3/envs/stda3/python.exe",
+            // "python": "~/anaconda3/envs/stda3/python.exe",
         }
     ]
 }
