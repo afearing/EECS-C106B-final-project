@@ -17,9 +17,9 @@
             "name": "Python: sailing3",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/stda-simulator/src/stda_sim_beautiful.py",
+            "program": "${workspaceFolder}/stda-simulator/beauty/stda_sim_beautiful.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/stda-simulator/src/",
+            "cwd": "${workspaceFolder}/stda-simulator/beauty/",
             // "python": "~/anaconda3/envs/stda3/python.exe",
         }
     ]
