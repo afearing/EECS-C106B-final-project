@@ -7,7 +7,7 @@ import io
 
 """
 notes on implementation
-STATE = [x_pos, y_pos, z_pos, roll, pitch, yaw, x_vel, y_vel, z_vel, roll_rate, pitch_rate, yaw_rate, rudder, sail] in R^14. All SI units, radians
+STATE = [x_pos, y_pos, z_pos, roll, pitch, yaw, x_vel, y_vel, z_vel, roll_rate, pitch_rate, yaw_rate, rudder_angle, sail_angle] in R^14. All SI units, radians
 
 
 
@@ -19,8 +19,12 @@ def main():
         sim_params = yaml.safe_load(stream)
     # run the simulation
     print(sim_params, save = save)
+    simulate(sim_params, save = save)
 
 
+
+def simulate(sim_params, save = False):
+    Ts = sim_params['simulator']['stepper']['stepsize']
 
 
 
