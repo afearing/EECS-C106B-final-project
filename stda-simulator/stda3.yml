@@ -1,9 +1,9 @@
-name: stda
+name: stda3
 channels:
   - conda-forge
   -  defaults
 dependencies:
-  - python=2.7
+  - python=3.8
   - numpy
   - scipy
   - pyyaml

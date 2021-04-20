@@ -5,12 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: sailing",
+            "name": "Python: sailing2",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/stda-simulator/src/run.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/stda-simulator/src/"
+            "cwd": "${workspaceFolder}/stda-simulator/src/",
+            "python.pythonPath": "~/anaconda3/envs/stda/python.exe",
+        }
+        {
+            "name": "Python: sailing3",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/stda-simulator/src/stda_sim_beautiful.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/stda-simulator/src/",
+            "python.pythonPath": "~/anaconda3/envs/stda3/python.exe",
         }
     ]
 }
