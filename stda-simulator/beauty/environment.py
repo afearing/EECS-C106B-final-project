@@ -26,7 +26,7 @@ class WaveInfluence:
         
         factor = -env.wave_amplitude * math.cos(frequency * env.time - wave_x * boat.pos_x - wave_y * boat.pos_y)
         gradient_x = wave_x * factor
-        gradient_y = wave_y * facto
+        gradient_y = wave_y * factor
         self.height = env.wave_amplitude * math.sin(frequency * env.time - wave_x * boat.pos_x - wave_y * boat.pos_y)
         self.gradient_x = gradient_x * math.cos(boat.yaw) + gradient_y * math.sin(boat.yaw)
         self.gradient_y = gradient_y * math.cos(boat.yaw) - gradient_x * math.sin(boat.yaw)
@@ -51,8 +51,8 @@ class ApparentWind:
 
         self.apparent_x = transformed_x - boat.vel_x
         self.apparent_y = transformed_y - boat.vel_y
-        self.apparent_angle = math.atan2(-apparent_y, -apparent_x)
-        self.apparent_speed = math.sqrt(apparent_x**2 + apparent_y**2)
+        self.apparent_angle = math.atan2(-self.apparent_y, -self.apparent_x)
+        self.apparent_speed = math.sqrt(self.apparent_x**2 + self.apparent_y**2)
 
         return (self.apparent_x, self.apparent_y, self.apparent_angle, self.apparent_speed)
 
@@ -75,7 +75,14 @@ class Damping:
         self.yaw    = env.damping_invariant_yaw *     boat.yaw_rate
         return (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
 
-
+class RudderForce:
+    def __init__():
+        self.x = None
+        self.y = None
+    def calculate_rudder_force(self, boat, env):
+        pressure = (env.water_density / 2) * boat.calculate_speed()**2
+        self.x = -(((4 * math.pi) / env.rudder_stretching) * boat.rudder_angle**2) * pressure * env.rudder_blade_area
+        self.y = 2 * math.pi * pressure * env.rudder_blade_area * boat.rudder_angle
 class HydrostaticForce:
     def __init__(self):
         self.x = None
@@ -83,7 +90,7 @@ class HydrostaticForce:
         self.z = None
         self.x_hs = None
         self.y_hs = None
-    def calculate_hydrostatic_force(boat, env):
+    def calculate_hydrostatic_force(self, boat, env):
         force = env.hydrostatic_invariant_z * (boat.pos_z - env.wave_influence.height) + env.gravity_force
         self.x = force * env.wave_influence.gradient_x
         self.y = force * env.wave_influence.gradient_y
@@ -135,5 +142,5 @@ class Environment:
         self.wave_influence.calculate_wave_influence(boat, self)
         self.damping.calculate_damping(boat, self)
         self.apparent_wind.calculate_apparent_wind(boat, self)
-        self.hydrostatic_force(boat, self)
-        self.wave_impedance = -np.sign(boat.vel_x) * boat.calculate_speed()**2 * (boat.calculate_speed()/self.hul_speed)**2 * self.wave_impedance_invariant
+        self.hydrostatic_force.calculate_hydrostatic_force(boat, self)
+        self.wave_impedance = -np.sign(boat.vel_x) * boat.calculate_speed()**2 * (boat.calculate_speed()/self.hull_speed)**2 * self.wave_impedance_invariant

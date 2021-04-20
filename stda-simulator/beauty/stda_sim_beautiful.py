@@ -23,7 +23,7 @@ def main():
 
 def simulate(boat_state, environment_state, save = False):
     
-
+    solve(boat_state, 0, environment_state)
     return False
 
 
@@ -33,7 +33,7 @@ def solve(boat_state, boat_ref, env):
 
     # For force calulations needed values
     speed = boat_state.calculate_speed()
-    env.calculate_forces(boat)
+    env.calculate_forces(boat_state)
     # Force calculation
 
 
