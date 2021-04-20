@@ -15,8 +15,9 @@ def main():
         sim_params = yaml.safe_load(stream)
     # run the simulation
     Ts = sim_params['simulator']['stepper']['stepsize']
-    boat_state = Boat(sim_params['boat']) #np.array(sim_params['initial_state'].values())
     environment_state = Environment(sim_params['environment'])
+    boat_state = Boat(sim_params['boat'], environment_state)
+    
     simulate(boat_state, environment_state, save = save)
 
 
@@ -33,7 +34,7 @@ def solve(boat_state, boat_ref, env):
 
     # For force calulations needed values
     speed = boat_state.calculate_speed()
-    env.calculate_forces(boat_state)
+    boat_state.calculate_forces(env)
     # Force calculation
 
 
