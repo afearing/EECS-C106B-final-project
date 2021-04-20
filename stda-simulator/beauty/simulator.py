@@ -21,6 +21,9 @@ class Simulator:
         
 
     def simulate(self):
+        for idx in range(self.N_steps):
+            speed = self.boat.calculate_speed()
+            drift = 
 
     def solve(self, time, boat_state):
         self.environment_state.time = time
