@@ -220,6 +220,10 @@ class Boat:
         delta_rudder = np.clip(delta_rudder, -self.max_rudder_speed, self.max_rudder_speed)
         delta_sail = -0.1 * (self.true_sail_angle - ref.sail_angle)
         delta_sail = np.clip(delta_sail, -self.max_sail_speed, self.max_sail_speed)
-        
+        delta = np.array([  delta_pos_x,     delta_pos_y,      delta_pos_z,
+                            delta_roll,      delta_pitch,      delta_yaw,
+                            delta_vel_x,     delta_vel_y,      delta_vel_z,
+                            delta_roll_rate, delta_pitch_rate, delta_yaw_rate]))
+        return delta
         
 

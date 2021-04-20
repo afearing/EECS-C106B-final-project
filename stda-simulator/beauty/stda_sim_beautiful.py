@@ -7,6 +7,7 @@ import math
 from collections import namedtuple
 from environment import *
 from boat import *
+from simulation import *
 
 def main():
     # simulation parameters. Set them here. We can change it to a yaml file to load later.
@@ -14,7 +15,7 @@ def main():
     with open('sim_config.yaml', 'r') as stream: #idek what this code does but it works https://stackoverflow.com/questions/1773805/how-can-i-parse-a-yaml-file-in-python
         sim_params = yaml.safe_load(stream)
     # run the simulation
-    Ts = sim_params['simulator']['stepper']['stepsize']
+    sim = Simulation(sim_params)
     environment_state = Environment(sim_params['environment'])
     boat_state = Boat(sim_params['boat'], environment_state)
     
@@ -36,8 +37,6 @@ def solve(boat_state, boat_ref, env):
     speed = boat_state.calculate_speed()
     boat_state.calculate_forces(env)
     # Force calculation
-
-
 
 
 if __name__ == '__main__':
