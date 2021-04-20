@@ -78,19 +78,43 @@ class HydrostaticForce:
         return (self.x, self.y, self.z, self.x_hs, self.y_hs)
 
 
-
-
-
 class RudderForce:
-    def __init__():
-        self.x = None
-        self.y = None
+    def __init__(self, boat, env):
+        self.calculate_rudder_force(boat, env)
+
     def calculate_rudder_force(self, boat, env):
         pressure = (env.water_density / 2) * boat.calculate_speed()**2
-        self.x = -(((4 * math.pi) / boat.rudder_stretching) * boat.rudder_angle**2) * pressure * env.rudder_blade_area
+        self.x = -(((4 * math.pi) / boat.rudder_stretching) * boat.rudder_angle**2) * pressure * boat.rudder_blade_area
         self.y = 2 * math.pi * pressure * boat.rudder_blade_area * boat.rudder_angle
+        return self.x, self.y
 
 
+
+class LateralForce:
+    def __init__(self, boat, env ):
+        self.calculate_lateral_force(boat, env)
+
+    def calculate_lateral_force(self, boat, env):
+        ''' Calculate the lateral force. 
+        return: The force applied to the lateral plane of the boat
+        '''
+        pressure = (env.water_density / 2) * boat.calculate_speed()**2 * math.cos(boat.roll)**2
+        friction = 2.66 * math.sqrt(env.water_viscosity / (boat.calculate_speed() * boat.keel_length)) if boat.calculate_speed() else 0
+        #     aoa :           angle of attack
+        # eff_aoa : effective angle of attack
+        aoa = math.atan2(boat.vel_y, boat.vel_x)
+        eff_aoa = aoa
+        if aoa < -math.pi / 2:
+            eff_aoa = math.pi + aoa
+        elif aoa > math.pi / 2:
+            eff_aoa = -math.pi + aoa
+        separation = 1- math.exp(-((abs(eff_aoa))/(math.pi/180*25))**2)
+        tmp = -(friction + (4 * math.pi * eff_aoa**2 * separation) / boat.keel_stretching)
+        separated_transverse_force = -np.sign(aoa) * pressure * boat.sail_area * math.sin(aoa)**2
+
+        self.x = (1 - separation) * (tmp * math.cos(aoa) + 2 * math.pi * eff_aoa * math.sin(aoa)) * pressure * boat.lateral_area
+        self.y = (1 - separation) * (tmp * math.sin(aoa) - 2 * math.pi * eff_aoa * math.cos(aoa)) * pressure * boat.lateral_area + separation * separated_transverse_force
+        self.separation = separation
 
 class Boat:
     """The class for the boat state"""
@@ -119,19 +143,21 @@ class Boat:
 
         self.wave_influence = WaveInfluence(self, env)
         self.apparent_wind = ApparentWind(self, env)
+        self.true_sail_angle = self.calculate_true_sail_angle(env)
         self.damping = Damping(self, env)
         self.hydrostatic_force = HydrostaticForce(self, env)
         self.wave_impedance = self.calculate_wave_impedance(env)
-        self.true_sail_angle = self.calculate_true_sail_angle(env)
+        self.rudder_force = RudderForce(self, env)
 
     def calculate_forces(self, env):
         self.wave_influence.calculate_wave_influence(self, env)
         self.apparent_wind.calculate_apparent_wind(self, env)
+        self.true_sail_angle = self.calculate_true_sail_angle(env)
         self.damping.calculate_damping(self, env)
         self.hydrostatic_force.calculate_hydrostatic_force(self, env)
         self.wave_impedance = self.calculate_wave_impedance(env)
-        self.true_sail_angle = self.calculate_true_sail_angle(env)
-        
+        self.rudder_force.calculate_rudder_force(self, env)        
+
     def calculate_wave_impedance(self, env):
         return -np.sign(self.vel_x) * self.calculate_speed()**2 * (self.calculate_speed()/self.hull_speed)**2 * self.wave_impedance_invariant
 

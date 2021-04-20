@@ -24,24 +24,18 @@ boat: {
         rudder_angle: 1,      # [rad]
     },
     boat_dimensions: {
-        sail: {
-            pressure_point_height: 2.48, # [m]
-            height:                 6.2, # [m]
-            area:                   6.4, # [m^2]
-            length:                   1, # [m]
-            stretching:           0.961
-        },
 
-        rudder: {
-            stretching: 2.326923076923077, 
-            area:                    0.13  # [m^2]
-        },
+        sail_pressure_point_height: 2.48, # [m]
+        sail_height:                 6.2, # [m]
+        sail_area:                   6.4, # [m^2]
+        sail_length:                   1, # [m]
+        sail_stretching:           0.961,
+        rudder_stretching: 2.326923076923077, 
+        rudder_blade_area:                    0.13,  # [m^2]
+        keel_height:      0.55, # [m]
+        keel_length:         2, # [m]
+        keel_stretching: 0.605,
 
-        keel: {
-            height:      0.55, # [m]
-            length:         2, # [m]
-            stretching: 0.605
-        },
 
         length:             4, # [m]
         mass:             350, # [kg]
