@@ -63,36 +63,42 @@ simulator: {
         # time controls
         stepsize:          0.1, # [s]  how far into the future to simulate
         clockrate:          10, # [Hz] how often to simulate
+        t_end:              180, # [s] how long to simulate
     },
-
+    waves:          True,   # whether waves are enabled
     # Initial state of simulation
-    initial: {
+    initial_state: {
+
+        pos_x: 0, # [m]
+        pos_y: 0, # [m]
+        pos_z: 0, # [m]
+
         vel_x: 0, # [m/s]
         vel_y: 0, # [m/s]
         vel_z: 0, # [m/s]
 
+        roll:  0, # maybe radians?
         yaw:   0,
         pitch: 0,
-        roll:  0,
 
-        roll_rate:  0,
+        roll_rate:  0, # maybe radians per second?
         pitch_rate: 0,
         yaw_rate:   0,
-
-        latitude:     18.306292, # [deg]
-        longitude:   -64.951150, # [deg]
-
+        
+        sail_angle:   1,      # [rad]
+        rudder_angle: 1,      # [rad]
+    },
+    disturbances: {
         wind_strength:   5.0,  # [m/s] 5.0 m/s ~= 4-5 bft
         wind_direction:  45.0, # [deg] wind from north-north-east
 
-        waves:          True,   # whether waves are enables
         wave_direction: 220.0,  # [deg] unused, keep for the future
         wave_length:      2.0,  # [m]   unused
         wave_amplitude:   0.0,  # [m]   unused
 
-        sail_angle:   1,      # [rad]
-        rudder_angle: 1,      # [rad]
+
     }
+
 }
 
 ...
