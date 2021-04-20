@@ -126,11 +126,12 @@ class Boat:
 
     def calculate_forces(self, env):
         self.wave_influence.calculate_wave_influence(self, env)
-        self.damping.calculate_damping(self, env)
         self.apparent_wind.calculate_apparent_wind(self, env)
+        self.damping.calculate_damping(self, env)
         self.hydrostatic_force.calculate_hydrostatic_force(self, env)
         self.wave_impedance = self.calculate_wave_impedance(env)
-
+        self.true_sail_angle = self.calculate_true_sail_angle(env)
+        
     def calculate_wave_impedance(self, env):
         return -np.sign(self.vel_x) * self.calculate_speed()**2 * (self.calculate_speed()/self.hull_speed)**2 * self.wave_impedance_invariant
 
@@ -138,5 +139,4 @@ class Boat:
         return math.sqrt(self.vel_x**2 + self.vel_y**2)
 
     def calculate_true_sail_angle(self, env):
-        self.true_sail_angle = np.sign(self.apparent_wind.apparent_angle) * abs(self.sail_angle)
-        return self.true_sail_angle
+        return np.sign(self.apparent_wind.apparent_angle) * abs(self.sail_angle)
