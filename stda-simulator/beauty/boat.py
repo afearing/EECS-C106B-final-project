@@ -191,6 +191,7 @@ class Boat:
         self.rudder_force.calculate_rudder_force(self, env)     
         self.lateral_force.calculate_lateral_force(self, env)   
         self.sail_force.calculate_sail_force(self, env)
+
     def calculate_wave_impedance(self, env):
         return -np.sign(self.vel_x) * self.calculate_speed()**2 * (self.calculate_speed()/self.hull_speed)**2 * self.wave_impedance_invariant
 
@@ -226,4 +227,16 @@ class Boat:
                             delta_roll_rate, delta_pitch_rate, delta_yaw_rate]))
         return delta
         
-
+        def set_state(self, boat_state):
+            self.pos_x,          self.pos_y,          self.pos_z    = boat_state[0:3]
+            self.roll,           self.pitch,          self.yaw      = boat_state[3:6]
+            self.vel_x,          self.vel_y,          self.vel_z    = boat_state[6:9]
+            self.roll_rate,      self.pitch_rate,     self.yaw_rate = boat_state[9:12]
+            self.rudder_angle,   self.sail_angle               = boat_state[12:14]
+        
+        def get_state(self):
+            return np.array([   self.pos_x,          self.pos_y,          self.pos_z,   
+                                self.roll,           self.pitch,          self.yaw,     
+                                self.vel_x,          self.vel_y,          self.vel_z,   
+                                self.roll_rate,      self.pitch_rate,     self.yaw_rate,
+                                self.rudder_angle,   self.sail_angle])

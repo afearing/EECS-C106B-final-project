@@ -5,9 +5,7 @@ import yaml
 import io
 import math
 from collections import namedtuple
-from environment import *
-from boat import *
-from simulation import *
+from simulator import *
 
 def main():
     # simulation parameters. Set them here. We can change it to a yaml file to load later.
@@ -16,8 +14,7 @@ def main():
         sim_params = yaml.safe_load(stream)
     # run the simulation
     sim = Simulation(sim_params)
-    environment_state = Environment(sim_params['environment'])
-    boat_state = Boat(sim_params['boat'], environment_state)
+    
     
     simulate(boat_state, environment_state, save = save)
 

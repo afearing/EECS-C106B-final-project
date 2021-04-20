@@ -93,5 +93,9 @@ simulator: {
     clockrate:          10, # [Hz] how often to simulate
     t_end:              180, # [s] how long to simulate
 }
-
+controller: {
+   P: 0,
+   I: 0,
+   D: 0
+}
 ...
