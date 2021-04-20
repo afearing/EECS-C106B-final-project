@@ -16,21 +16,6 @@ import math
 class Boat:
     """The class for the boat state"""
     def __init__(self, boat_params):
-        # self.pos_x   = initial_state['pos_x']
-        # self.pos_y   = initial_state['pos_y'] 
-        # self.pos_z   = initial_state['pos_z']
-        # self.vel_x   = initial_state['vel_x']
-        # self.vel_y   = initial_state['vel_y']
-        # self.vel_z   = initial_state['vel_z']
-        # self.roll    = initial_state['roll']
-        # self.pitch   = initial_state['pitch']
-        # self.yaw     = initial_state['yaw']
-        # self.roll_rate = initial_state['roll_rate']
-        # self.pitch_rate = initial_state['pitch_rate']
-        # self.yaw_rate = initial_state['yaw_rate']
-        # self.sail_angle = initial_state['sail_angle']
-        # self.rudder_angle = initial_state['rudder_angle']
-        # self.self.boat_props = boat_params # leave it like this for the moment because idk what to do with the dimensions
         for key, val in boat_params['initial_state'].items():
             exec('self.' + key + '= val') # this is supposed to load all the parameters as variables https://stackoverflow.com/questions/18090672/convert-dictionary-entries-into-variables-python
         for key, val in boat_params['dimensions'].items():
