@@ -32,6 +32,9 @@ class Environment:
             exec('self.' + key + '= val')
         for key, val in env_params['disturbances'].items():
             exec('self.' + key + '= val')
+        self.time = 0
+        self.wind_x = self.wind_strength * math.cos(self.wind_direction)
+        self.wind_y = self.wind_strength * math.sin(self.wind_direction)
 
 def main():
     # simulation parameters. Set them here. We can change it to a yaml file to load later.
@@ -54,7 +57,7 @@ def simulate(boat_state, environment_state, save = False):
 
 
 
-def solve(time, boat_state, boat_ref, environment_parameters):
+def solve(boat_state, boat_ref, environment_parameters):
 
     # For force calulations needed values
     speed = calculate_speed(boat_state)
@@ -70,51 +73,43 @@ def calculate_speed(boat_state):
 
 
 
-def calculate_wave_influence(time, boat_state, environment_parameters):
+def calculate_wave_influence(boat, env):
     ''' Calculate how the waves influence the boat. 
     param time:     The simulation time                     [s]
 
     return: The influence of the waves on the boat
     '''
-    g =                 environment_parameters['environment']['gravity']
-    wave_length =       environment_parameters['disturbances']['wave_length']
-    wave_direction =    environment_parameters['disturbances']['wave_direction']
-    wave_amplitude =    environment_parameters['disturbances']['wave_amplitude']
-    frequency = math.sqrt((2 * math.pi * g) / wave_length)
-    pos_x = boat_state[0]
-    pos_y = boat_state[1]
-    yaw   = boat_state[5]
+    frequency = math.sqrt((2 * math.pi * env.gravity) / env.wave_length)
+
     # wave vector components in cartesian coordinates
-    wave_x = 2*math.pi / wave_length * math.cos(wave_direction)
-    wave_y = 2*math.pi / wave_length * math.sin(wave_direction)
-    factor = -wave_amplitude * math.cos(frequency * time - wave_x * pos_x - wave_y * pos_y)
+    wave_x = 2*math.pi / env.wave_length * math.cos(env.wave_direction)
+    wave_y = 2*math.pi / env.wave_length * math.sin(env.wave_direction)
+
+    factor = -env.wave_amplitude * math.cos(frequency * env.time - wave_x * boat.pos_x - wave_y * boat.pos_y)
     gradient_x = wave_x * factor
     gradient_y = wave_y * factor
 
-    height = wave_amplitude * math.sin(frequency * time - wave_x * pos_x - wave_y * pos_y)
-    gradient_x = gradient_x * math.cos(yaw) + gradient_y * math.sin(yaw)
-    gradient_y = gradient_y * math.cos(yaw) - gradient_x * math.sin(yaw)
+    height = env.wave_amplitude * math.sin(frequency * env.time - wave_x * boat.pos_x - wave_y * boat.pos_y)
+    gradient_x = gradient_x * math.cos(boat.yaw) + gradient_y * math.sin(boat.yaw)
+    gradient_y = gradient_y * math.cos(boat.yaw) - gradient_x * math.sin(boat.yaw)
     return (height, gradient_x, gradient_y)
 
-def calculate_apparent_wind(boat_state, environment_parameters):
+
+
+def calculate_apparent_wind(boat, env):
     ''' Calculate the apparent wind on the boat. 
-    param true_wind:    The true wind directions
 
     return: The apparent wind on the boat
     '''
-    true_wind
-    transformed_x = true_wind.x * cos(yaw) + true_wind.y * sin(yaw)
-    transformed_y = true_wind.x * -sin(yaw) + true_wind.y * cos(yaw)
+    transformed_x = env.wind_x * math.cos(boat.yaw) + env.wind_y * math.sin(boat.yaw)
+    transformed_y = env.wind_x * -math.sin(boat.yaw) + env.wind_y * math.cos(boat.yaw)
 
-    apparent_x = transformed_x - vel_x
-    apparent_y = transformed_y - vel_y
-    apparent_angle = atan2(-apparent_y, -apparent_x)
-    apparent_speed = sqrt(apparent_x**2 + apparent_y**2)
+    apparent_x = transformed_x - boat.vel_x
+    apparent_y = transformed_y - boat.vel_y
+    apparent_angle = math.atan2(-apparent_y, -apparent_x)
+    apparent_speed = math.sqrt(apparent_x**2 + apparent_y**2)
 
-    return ApparentWind(x=apparent_x,
-                        y=apparent_y,
-                        angle=apparent_angle,
-                        speed=apparent_speed)
+    return (apparent_x, apparent_y, angle=apparent_angle, speed=apparent_speed)
 
 
 
