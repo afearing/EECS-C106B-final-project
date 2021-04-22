@@ -144,6 +144,28 @@ class SailForce:
         self.x = (1 - separation) * propulsion + separation * separated_propulsion
         self.y =(1 - separation) * transverse_force + separation * separated_transverse_force
 
+
+class Controller:
+    def __init__(self, sample_time, controller_params):
+        self.sample_time = sample time
+        self.factor
+        for key, val in controller_params.items():
+            exec('self.' + key + '= val')
+        self.rudder_angle = 0
+        self.sail_angle = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Boat:
     """The class for the boat state"""
     def __init__(self, boat_params, env):

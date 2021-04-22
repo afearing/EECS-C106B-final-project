@@ -64,6 +64,13 @@ boat: {
         along_damping:       15,
         transverse_damping:   5,
         hull_speed:         2.5
+    },
+    controller: { 
+        max_rudder_angle: 0.261799388, # 15*pi/180
+        speed_adaptation: 0.3,
+        KP: 0.5,
+        KI: 0.1,
+        KD: 0.9
     }
     
 }

@@ -41,5 +41,6 @@ class Simulator:
         return self.boat.calculate_state_delta(self.controller)
 
     def init_integrator(self, boat):
-        integrator = scipy.integrate.ode(self.solve).set_integrator('dopri5')
+        integrator = scipy.integrate.ode(boat.solve).set_integrator('dopri5')
         integrator.set_initial_value(boat.get_state(), 0)
+        return integrator
