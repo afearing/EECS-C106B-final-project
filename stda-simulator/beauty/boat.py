@@ -171,6 +171,8 @@ class Controller:
         self.KP = K[0]
         self.KD = K[1]
         self.KI = -K[2]
+
+        
     def controll(self, desired_heading, drift_angle, boat, env):
         heading_error = desired_heading - heading_error
         # respect to periodicity of angle: maximum difference is 180 deg resp. pi
