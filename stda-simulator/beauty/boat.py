@@ -146,13 +146,52 @@ class SailForce:
 
 
 class Controller:
-    def __init__(self, sample_time, controller_params):
+    def __init__(self, sample_time, controller_params, boat, env):
         self.sample_time = sample time
-        self.factor
+        self.factor = boat.distance_cog_rudder * boat.rudder_blade_area * math.pi * env.water_density / boat.moi_z
         for key, val in controller_params.items():
             exec('self.' + key + '= val')
-        self.rudder_angle = 0
-        self.sail_angle = 0
+        # initial values:
+        self.summed_error = 0
+        self.filtered_drift = 0
+
+
+        # calculate controller parameters
+        # approximated system modell, linearized, continous calculated (seems to be fine)
+        A = np.array([  [0, 1, 0],
+                        [0, -1/boat.yaw_time_constant, 0],
+                        [-1, 0, 0]])
+        B = np.array([0, 1, 1])
+        # weigth matrices for riccati design
+        Q = np.diag([0.1, 1, 0.3])
+        r = np.ones((1, 1))*30
+        # calculating feedback
+        P = scipy.linalg.solve_continuous_are(A, B[:, None], Q, r)
+        K = np.sum(B[None, :] * P, axis = 1)/r[0, 0]
+        self.KP = K[0]
+        self.KD = K[1]
+        self.KI = -K[2]
+    def controll(self, desired_heading, drift_angle, boat, env):
+        heading_error = desired_heading - heading_error
+        # respect to periodicity of angle: maximum difference is 180 deg resp. pi
+        while heading_error > math.pi:
+            heading_error -= 2*math.pi
+        while heading_error < -math.pi:
+            heading_error += 2*math.pi
+        self.summed_error += self.sample_time * (heading_error - drift_angle)
+        # avoid high gains at low speed (singularity)
+        if boat.calculate_speed() < self.speed_adaption:
+            boat.calculate_speed() = self.speed_adaption
+        
+        factor2 = -1.0 / self.factor / boat.calculate_speed()**2 / math.cos(boat.roll)
+
+        #control equation
+        rudder_angle = factor2 * (self.KP * heading_error + self.KI * self.summed_error - self.KD * boat.yaw_rate)
+        if abs(rudder_angle) > boat.max_rudder_angle:
+            rudder_angle = np.clip(rudder_angle, -boat.max_rudder_angle, boat.max_rudder_angle)
+            self.summed_error = (rudder_angle/factor2 - (self.KP * heading_error - self.KD * boat.yaw_rate)) / self.KI
+        return rudder_angle 
+
 
 
 
@@ -219,6 +258,8 @@ class Boat:
 
     def calculate_speed(self):
         return math.sqrt(self.vel_x**2 + self.vel_y**2)
+    def calculate_drift(self):
+        return math.arctan2(self.vel_y, self.vel_x)
 
     def calculate_true_sail_angle(self, env):
         return np.sign(self.apparent_wind.apparent_angle) * abs(self.sail_angle)
