@@ -94,47 +94,14 @@ def scenario_1(save=False):
     integrator2 = simple_integrator(deq_sparse)
     integrator2.set_initial_value(x0, 0)
     
-    #controller2 = heading_controller(sampletime)
-    ##controller2.KP = 0
-    ##controller2.KD = 0
-    ##controller2.KI = controller2.KI /100
-    #controller2.calculate_controller_params(YAW_TIMECONSTANT, Q=diag([1E-1, 1, 5]), r=ones((1,1))*1000)
-
-    # reference trajectory heading    
-    
-    #ref_heading[:int(30/sampletime)] = -.2*pi*0
-    
     
     ref_heading[int(40/sampletime):] = 1.2*pi
     
-    #ref_heading[int(30/sampletime):int(33/sampletime)] = 0.8*pi
-    #ref_heading[int(30/sampletime):] = .9*pi
+
     
     ref_heading[int(90/sampletime) :] = .35 * pi
-    
-    #ref_heading = smooth_reference(ref_heading, int(5/sampletime))
-    
-    def set_predefined_sail_angle():
-        predefined_sail_angle = ones(N_steps + 1)
-        predefined_sail_angle[:int(30/sampletime)] = 48*pi/180
-        #predefined_sail_angle[:int(10/sampletime)] = -65*pi/180
-        predefined_sail_angle[int(30/sampletime):] = 33*pi/180
-        predefined_sail_angle[int(30/sampletime):int(50/sampletime)] = 48*pi/180
-        predefined_sail_angle[int(48/sampletime):int(55/sampletime)] = 41*pi/180
-        
-        return predefined_sail_angle
-    
-    def set_predefined_sail_angle2():
-        predefined_sail_angle = ones(N_steps + 1)
-        predefined_sail_angle[:int(30/sampletime)] = 48*pi/180
-        #predefined_sail_angle[:int(10/sampletime)] = -65*pi/180
-        #predefined_sail_angle[int(30/sampletime):] = 33*pi/180
-        predefined_sail_angle[int(30/sampletime):int(50/sampletime)] = 48*pi/180
-        predefined_sail_angle[int(58/sampletime):] = 41*pi/180
-        
-        return predefined_sail_angle
-    
-    #sail_angle = set_predefined_sail_angle2()
+
+
     sail_angle = None
     
     x, t, separation, keel, sail_force, sail, r = simulate(N_steps, x, t, r, sail, environment, controller, 
