@@ -14,6 +14,7 @@ def main():
     #save=False
     
     scenario_1(save=save)
+    scenario_0(save=save)
     
     plt.show()
 
@@ -71,9 +72,9 @@ def scenario_1(save=False):
     environment[TRUE_WIND] = wind
     
     # simulation params
-    t_end = 180.
+    t_end = 150.
     #t_end = 57.
-    sampletime = .1
+    sampletime = .3
     sail_sampletime = 2.
     N_steps = int(t_end / sampletime)
     # initial values
@@ -93,34 +94,18 @@ def scenario_1(save=False):
     integrator2 = simple_integrator(deq_sparse)
     integrator2.set_initial_value(x0, 0)
     
-    #controller2 = heading_controller(sampletime)
-    ##controller2.KP = 0
-    ##controller2.KD = 0
-    ##controller2.KI = controller2.KI /100
-    #controller2.calculate_controller_params(YAW_TIMECONSTANT, Q=diag([1E-1, 1, 5]), r=ones((1,1))*1000)
-
-    # reference trajectory heading    
     
-    #ref_heading[:int(30/sampletime)] = -.2*pi*0
+    ref_heading[int(40/sampletime):] = 1.2*pi
     
-    
-    ref_heading[int(40/sampletime):] = 0.5*pi# 1.2*pi
-    
-    #ref_heading[int(30/sampletime):int(33/sampletime)] = 0.8*pi
-    #ref_heading[int(30/sampletime):] = .9*pi
-    
-    # ref_heading[int(90/sampletime) :] = 0.0 #0.35 * pi
-    
-    #ref_heading = smooth_reference(ref_heading, int(5/sampletime))
 
     
-    #sail_angle = set_predefined_sail_angle2()
+    ref_heading[int(90/sampletime) :] = .35 * pi
+
+
     sail_angle = None
     
     x, t, separation, keel, sail_force, sail, r = simulate(N_steps, x, t, r, sail, environment, controller, 
                                                             integrator, sampletime, sail_sampletime, ref_heading, wind, sail_angle)
-    
-    #comp_route(x, x2)
     
     
     plots_manoevers(t, x, r, sail, ref_heading, save, sail_force=sail_force, keel_force=keel, separation=separation, wind=wind, append=append)
@@ -167,7 +152,7 @@ def plots_manoevers(t, x, r, sail, ref_heading, save, sail_force=None, keel_forc
     #ax_traj.legend(['route', 'start', 'wind'])
     
     # heading plot
-    heading_data = [x[YAW, :], ref_heading, arctan2(x[VEL_Y, :], x[VEL_X, :])]
+    heading_data = [x[YAW, :] + 2*pi, ref_heading, arctan2(x[VEL_Y, :], x[VEL_X, :])]
     heading_labels = ['Heading', 'Reference', 'Drift']
     fig_heading, ax_heading = plot_time_fig(time=t, data=heading_data, labels=heading_labels, ax_labels=axlabels, scale=scale, ticks='ang')
     

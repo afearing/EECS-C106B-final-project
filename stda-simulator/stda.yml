@@ -1,4 +1,4 @@
-name: stda 
+name: stda
 channels:
   - conda-forge
   -  defaults
