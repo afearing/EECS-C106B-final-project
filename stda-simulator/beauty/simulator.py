@@ -19,11 +19,12 @@ class Simulator:
         
 
     def simulate(self):
-        return scipy.integrate.solve_ivp(fun=self.solve, t_span=(0,self.t_end), y0=self.boat.get_state(), method='RK45', ) # t_eval=np.linspace(0, self.t_end, self.stepsize))
+        return scipy.integrate.solve_ivp(fun=self.solve, t_span=(0,self.t_end), y0=self.boat.get_state(), method='RK45', ), self.environment_state # t_eval=np.linspace(0, self.t_end, self.stepsize))
 
     def solve(self, time, boat_state):
         self.environment_state.time = time
+        self.environment_state.step_counter += 1
         self.boat.set_state(boat_state, self.environment_state)
         self.boat.calculate_forces(self.environment_state)
-        return self.boat.calculate_state_delta()
+        return self.boat.calculate_state_delta(self.environment_state)
 

@@ -56,9 +56,9 @@ class Boat:
     def calculate_forces(self, env):
         self.forces.calculate_forces(self, env)
 
-    def calculate_state_delta(self):
+    def calculate_state_delta(self, env):
         sail_angle_reference = self.calculate_sail_angle_reference()
-        rudder_angle_reference = self.controller.controll(self)
+        rudder_angle_reference = self.controller.controll(self, env)
 
 
         delta_pos_x = self.vel_x * math.cos(self.yaw) - self.vel_y * math.sin(self.yaw)
@@ -83,7 +83,8 @@ class Boat:
         delta = np.array([  delta_pos_x,     delta_pos_y,      delta_pos_z,
                             delta_roll,      delta_pitch,      delta_yaw,
                             delta_vel_x,     delta_vel_y,      delta_vel_z,
-                            delta_roll_rate, delta_pitch_rate, delta_yaw_rate])
+                            delta_roll_rate, delta_pitch_rate, delta_yaw_rate,
+                            delta_rudder, delta_sail])
         return delta
         
     def set_state(self, boat_state, env):

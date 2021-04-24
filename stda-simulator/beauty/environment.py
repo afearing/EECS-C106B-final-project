@@ -17,5 +17,6 @@ class Environment:
             exec('self.' + key + '= val')
 
         self.time = 0
+        self.step_counter = 0
         self.wind_x = self.wind_strength * math.cos(self.wind_direction)
         self.wind_y = self.wind_strength * math.sin(self.wind_direction)
