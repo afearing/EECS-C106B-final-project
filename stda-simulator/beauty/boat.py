@@ -262,11 +262,13 @@ class Forces:
 
 
 class Controller:
-    def __init__(self, sample_time, controller_params, boat, env):
-        self.sample_time = sample time
-        self.factor = boat.distance_cog_rudder * boat.rudder_blade_area * math.pi * env.water_density / boat.moi_z
-        for key, val in controller_params.items():
+    def __init__(self, sim_params, boat, env):
+        self.sample_time = sim_params['simulator']['stepsize']
+        
+        for key, val in sim_params['boat']['controller'].items():
             exec('self.' + key + '= val')
+        
+        self.factor = boat.distance_cog_rudder * boat.rudder_blade_area * math.pi * env.water_density / boat.moi_z
         # initial values:
         self.summed_error = 0
         self.filtered_drift = 0
@@ -289,7 +291,7 @@ class Controller:
         self.KI = -K[2]
 
         # Desired path
-        self.desired_path = Path(boat, env)
+        self.heading = Path(boat, env)
         
     def controll(self, desired_heading, drift_angle, boat, env):
         heading_error = desired_heading - heading_error
@@ -344,8 +346,8 @@ class Boat:
         self.damping_invariant_roll   = -2 * self.roll_damping * math.sqrt(self.moi_x * self.mass * env.gravity * self.hydrostatic_eff_x)
         ### End Invariants
 
-        # forces
         self.forces = Forces(self, env)
+        self.controller = Controller(sim_params, self, env)
 
     def calculate_speed(self):
         return math.sqrt(self.vel_x**2 + self.vel_y**2)
@@ -359,20 +361,20 @@ class Boat:
         delta_pos_y = self.vel_y * math.cos(self.yaw) - self.vel_x * math.sin(self.yaw)
         delta_pos_z = self.vel_z
         delta_roll = self.roll_rate
-        delta_pitch = pitch_rate * math.cos(self.roll) - self.yaw_rate * math.sin(roll)
+        delta_pitch = pitch_rate * math.cos(self.roll) - self.yaw_rate * math.sin(self.roll)
         delta_yaw = self.yaw_rate * math.cos(self.roll) + self.pitch_rate * math.sin(self.roll)
 
-        delta_vel_x = delta_yaw * self.vel_y + (self.sail_force.x + self.lateral_force.x + self.rudder_force.x + self.damping.x + self.wave_impedance + self.hydrostatic_force.x) / self.mass
-        delta_vel_y = -delta_yaw * self.vel_x + ((self.sail_force.y + self.lateral_force.y + self.rudder_force.y) * math.cos(self.roll) + self.hydrostatic_force.y + self.damping.y) / self.mass
-        delta_vel_z = ((self.sail_force.y + self.lateral_force.y + self.rudder_force.y) * math.sin(self.roll) + self.hydrostatic_force.z - self.gravity_force + self.damping.z) / self.mass
+        delta_vel_x = delta_yaw * self.vel_y + (self.forces.sail_force.x + self.forces.lateral_force.x + self.forces.rudder_force.x + sself.forceself.damping.x + self.forces.wave_impedance + self.forces.hydrostatic_force.x) / self.mass
+        delta_vel_y = -delta_yaw * self.vel_x + ((self.forces.sail_force.y + self.forces.lateral_force.y + self.forces.rudder_force.y) * math.cos(self.roll) + self.forces.hydrostatic_force.y + self.forces.damping.y) / self.mass
+        delta_vel_z = ((self.forces.sail_force.y + self.forces.lateral_force.y + self.forces.rudder_force.y) * math.sin(self.roll) + self.forces.hydrostatic_force.z - self.gravity_force + self.forces.damping.z) / self.mass
 
-        delta_roll_rate = (self.hydrostatic_force.z * self.hydrostatic_force.y_hs - self.sail_force.y * self.sail_pressure_point_height + self.damping.roll)/self.moi_x
-        delta_pitch_rate = (self.sail_force.x * self.sail_pressure_point_height - self.hydrostatic_force.z * self.hydrostatic_force.x_hs * math.cos(self.roll) + self.damping.pitch - (self.moi_x - self.moi_z) * self.roll_rate * self.yaw_rate) / self.moi_y
-        delta_yaw_rate = (self.damping.yaw - self.rudder_force.y * self.distance_cog_rudder + self.sail_force.y * self.distance_cog_sail_pressure_point + self.sail_force.x * math.sin(self.true_sail_angle) * self.distance_mast_sail_pressure_point + self.lateral_force.y * (self.distance_cog_keel_pressure_point * (1-self.lateral_force.lateral_separation) + self.distance_cog_keel_middle * self.lateral_force.lateral_separation))/ self.moi_z
+        delta_roll_rate = (self.forces.hydrostatic_force.z * self.forces.hydrostatic_force.y_hs - self.forces.sail_force.y * self.sail_pressure_point_height + self.damping.roll)/self.moi_x
+        delta_pitch_rate = (self.forces.sail_force.x * self.sail_pressure_point_height - self.forces.hydrostatic_force.z * self.forces.hydrostatic_force.x_hs * math.cos(self.roll) + self.forces.damping.pitch - (self.moi_x - self.moi_z) * self.roll_rate * self.yaw_rate) / self.moi_y
+        delta_yaw_rate = (self.forces.damping.yaw - self.forces.rudder_force.y * self.distance_cog_rudder + self.forces.sail_force.y * self.distance_cog_sail_pressure_point + self.forces.sail_force.x * math.sin(self.true_sail_angle) * self.distance_mast_sail_pressure_point + self.forces.lateral_force.y * (self.distance_cog_keel_pressure_point * (1-self.forces.lateral_force.lateral_separation) + self.distance_cog_keel_middle * self.forces.lateral_force.lateral_separation))/ self.moi_z
 
         delta_rudder = -2 * (self.rudder_angle - ref.rudder_angle)
         delta_rudder = np.clip(delta_rudder, -self.max_rudder_speed, self.max_rudder_speed)
-        delta_sail = -0.1 * (self.true_sail_angle - ref.sail_angle)
+        delta_sail = -0.1 * (self.forces.true_sail_angle - ref.sail_angle)
         delta_sail = np.clip(delta_sail, -self.max_sail_speed, self.max_sail_speed)
         delta = np.array([  delta_pos_x,     delta_pos_y,      delta_pos_z,
                             delta_roll,      delta_pitch,      delta_yaw,
@@ -386,7 +388,7 @@ class Boat:
             self.vel_x,          self.vel_y,          self.vel_z    = boat_state[6:9]
             self.roll_rate,      self.pitch_rate,     self.yaw_rate = boat_state[9:12]
             self.rudder_angle,   self.sail_angle               = boat_state[12:14]
-            self.calculate_forces(env)
+            self.calculate_forces(self, env)
         
         def get_state(self):
             return np.array([   self.pos_x,          self.pos_y,          self.pos_z,   
