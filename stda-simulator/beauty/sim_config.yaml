@@ -63,17 +63,23 @@ boat: {
         yaw_timeconstant:     5,
         along_damping:       15,
         transverse_damping:   5,
-        hull_speed:         2.5
+        hull_speed:         2.5,
+
+        # limits
+        max_rudder_angle: 0.261799388, # 15*pi/180
+        max_rudder_speed: 0.104719755, # pi/30
+        max_sail_speed: 0.314159265 # pi/10
     },
     controller: { 
-        max_rudder_angle: 0.261799388, # 15*pi/180
         speed_adaptation: 0.3,
     #     KP: 0.5,  # calculated in controller class
     #     KI: 0.1,  # calculated in controller class
     #     KD: 0.9   # calculated in controller class
     }
-    
+
 }
+
+
 
 environment: {
     properties: {
@@ -100,9 +106,5 @@ simulator: {
     clockrate:          10, # [Hz] how often to simulate
     t_end:              180, # [s] how long to simulate
 }
-controller: {
-   P: 0,
-   I: 0,
-   D: 0
-}
+
 ...

@@ -15,32 +15,18 @@ class Simulator:
          for key, val in sim_params['simulator'].items():
             exec('self.' + key + '= val')
         self.environment_state = Environment(sim_params['environment'])
-        self.boat = Boat(sim_params['boat'], self.environment_state)
-        self.controller = Controller(sim_params['controller'])
-
-
-        self.N_steps = int(self.t_end * self.clockrate)
-        # initialize data arrays. Might put these in boat but leave them in the Simulator class for now
-        self.x = np.zeros((14, self.N_steps + 1))
-        self.r = np.zeros(N_steps + 1)
-        self.sail = np.zeros(N_steps + 1)
-        self.t = np.zeros(N_steps + 1)
-        self.x[:, 0] = self.boat.get_state()
-        self.ref_heading = np.zeros(N_steps + 1)
+        self.boat = Boat(sim_params, self.environment_state)
+        self.controller = Controller(self.stepsize, sim_params['controller'], self.boat, self.environment_state)
         
 
     def simulate(self):
-        for idx in range(self.N_steps):
-            speed = self.boat.calculate_speed()
-            drift = 
+        return scipy.integrate.solve_ivp(fun=self.solve, t_span=(0,self.t_end), y0=boat.get_state(), method='RK45', t_eval=np.linspace(0, self.t_end, self.stepsize)))
 
     def solve(self, time, boat_state):
         self.environment_state.time = time
         self.boat.set_state(boat_state)
         self.boat.calculate_forces(self.environment_state)
+
+        # controller in here maybe
         return self.boat.calculate_state_delta(self.controller)
 
-    def init_integrator(self, boat):
-        integrator = scipy.integrate.ode(boat.solve).set_integrator('dopri5')
-        integrator.set_initial_value(boat.get_state(), 0)
-        return integrator

@@ -106,10 +106,6 @@ def scenario_1(save=False):
     
     x, t, separation, keel, sail_force, sail, r = simulate(N_steps, x, t, r, sail, environment, controller, 
                                                             integrator, sampletime, sail_sampletime, ref_heading, wind, sail_angle)
-    x2, t2, separation2, keel2, sail_force2, sail2, r2 = simulate(N_steps, x2, t2, r2, sail, environment, controller, 
-                                                            integrator2, sampletime, sail_sampletime, ref_heading, wind, sail_angle)
-    
-    #comp_route(x, x2)
     
     
     plots_manoevers(t, x, r, sail, ref_heading, save, sail_force=sail_force, keel_force=keel, separation=separation, wind=wind, append=append)

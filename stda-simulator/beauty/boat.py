@@ -145,6 +145,9 @@ class SailForce:
         self.y =(1 - separation) * transverse_force + separation * separated_transverse_force
 
 
+
+
+
 class Controller:
     def __init__(self, sample_time, controller_params, boat, env):
         self.sample_time = sample time
@@ -172,6 +175,8 @@ class Controller:
         self.KD = K[1]
         self.KI = -K[2]
 
+        # Desired path
+        self.desired_path = Path(boat, env)
         
     def controll(self, desired_heading, drift_angle, boat, env):
         heading_error = desired_heading - heading_error
@@ -195,24 +200,19 @@ class Controller:
         return rudder_angle 
 
 
-
-
-
-
-
-
-
-
-
-
+class Path:
+    def __init__(self, boat, env):
+        self.desired_heading = 0.5*math.pi # for testing
+    def get_desired_heading(self):
+        return self.desired_heading
 
 
 class Boat:
     """The class for the boat state"""
-    def __init__(self, boat_params, env):
-        for key, val in boat_params['initial_state'].items():
+    def __init__(self, sim_params, env):
+        for key, val in sim_params['boat']['initial_state'].items():
             exec('self.' + key + '= val') # this is supposed to load all the parameters as variables https://stackoverflow.com/questions/18090672/convert-dictionary-entries-into-variables-python
-        for key, val in boat_params['boat_dimensions'].items():
+        for key, val in sim_params['boat']['boat_dimensions'].items():
             exec('self.' + key + '= val')
         ###
         # Invariants
@@ -229,12 +229,9 @@ class Boat:
         self.damping_invariant_yaw    = -(self.moi_z / self.yaw_timeconstant)
         self.damping_invariant_pitch  = -2 * self.pitch_damping * math.sqrt(self.moi_y * self.mass * env.gravity * self.hydrostatic_eff_y)
         self.damping_invariant_roll   = -2 * self.roll_damping * math.sqrt(self.moi_x * self.mass * env.gravity * self.hydrostatic_eff_x)
-        ###
-        self.max_rudder_speed = math.pi/30
-        self.max_sail_speed = math.pi/10
+        ### End Invariants
 
-
-
+        # forces
         self.wave_influence = WaveInfluence(self, env)
         self.apparent_wind = ApparentWind(self, env)
         self.true_sail_angle = self.calculate_true_sail_angle(env)
@@ -244,6 +241,8 @@ class Boat:
         self.rudder_force = RudderForce(self, env)
         self.lateral_force = LateralForce(self, env)
         self.sail_force = SailForce(self, env)
+
+
     def calculate_forces(self, env):
         self.wave_influence.calculate_wave_influence(self, env)
         self.apparent_wind.calculate_apparent_wind(self, env)
@@ -292,12 +291,13 @@ class Boat:
                             delta_roll_rate, delta_pitch_rate, delta_yaw_rate]))
         return delta
         
-        def set_state(self, boat_state):
+        def set_state(self, boat_state, env):
             self.pos_x,          self.pos_y,          self.pos_z    = boat_state[0:3]
             self.roll,           self.pitch,          self.yaw      = boat_state[3:6]
             self.vel_x,          self.vel_y,          self.vel_z    = boat_state[6:9]
             self.roll_rate,      self.pitch_rate,     self.yaw_rate = boat_state[9:12]
             self.rudder_angle,   self.sail_angle               = boat_state[12:14]
+            self.calculate_forces(env)
         
         def get_state(self):
             return np.array([   self.pos_x,          self.pos_y,          self.pos_z,   
