@@ -355,8 +355,10 @@ class Boat:
     def calculate_drift(self):
         return math.arctan2(self.vel_y, self.vel_x)
 
+    def calculate_forces(self, env):
+        self.forces.calculate_forces(self, env)
 
-    def calculate_state_delta(self, ref):
+    def calculate_state_delta(self):
         delta_pos_x = self.vel_x * math.cos(self.yaw) - self.vel_y * math.sin(self.yaw)
         delta_pos_y = self.vel_y * math.cos(self.yaw) - self.vel_x * math.sin(self.yaw)
         delta_pos_z = self.vel_z
@@ -374,7 +376,7 @@ class Boat:
 
         delta_rudder = -2 * (self.rudder_angle - ref.rudder_angle)
         delta_rudder = np.clip(delta_rudder, -self.max_rudder_speed, self.max_rudder_speed)
-        delta_sail = -0.1 * (self.forces.true_sail_angle - ref.sail_angle)
+        delta_sail = -0.1 * (self.forces.true_sail_angle - self.calculate_sail_angle_reference())
         delta_sail = np.clip(delta_sail, -self.max_sail_speed, self.max_sail_speed)
         delta = np.array([  delta_pos_x,     delta_pos_y,      delta_pos_z,
                             delta_roll,      delta_pitch,      delta_yaw,
@@ -396,3 +398,14 @@ class Boat:
                                 self.vel_x,          self.vel_y,          self.vel_z,   
                                 self.roll_rate,      self.pitch_rate,     self.yaw_rate,
                                 self.rudder_angle,   self.sail_angle])
+        def calculate_sail_angle_reference(self):
+            wind_angle = forces.apparent_wind.angle
+            wind_speed = forces.apparend_wind.speed
+
+            opt_aoa = math.sin(wind_angle)/ (math.cos(wind_angle) + 0.4 * math.cos(wind_angle)**2) * self.sail_stretching / 4
+            if abs(obt_aoa) > self.stall_deg/180*math.pi:
+                opt_aoa = np.sign(wind_angle * self.stall_deg/180*math.pi)
+            if wind_speed > self.limit_wind_speed:
+                fact = (self.limit_wind_speed / wind_speed)**2
+                opt_aoa *= fact
+            return abs(np.clip(wind_angle - opt_aoa, -math.pi/2, math.pi/2))

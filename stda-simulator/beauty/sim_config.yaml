@@ -68,7 +68,10 @@ boat: {
         # limits
         max_rudder_angle: 0.261799388, # 15*pi/180
         max_rudder_speed: 0.104719755, # pi/30
-        max_sail_speed: 0.314159265 # pi/10
+        max_sail_speed: 0.314159265, # pi/10
+        sail_sampletime: 2, # i have no idea why this is a thing
+        limit_wind_speed: 6, # used to calculate sail angle
+        stall_deg: 14 # used to calculate sail angle
     },
     controller: { 
         speed_adaptation: 0.3,
