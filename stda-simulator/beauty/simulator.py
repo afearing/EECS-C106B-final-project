@@ -25,6 +25,4 @@ class Simulator:
         self.environment_state.time = time
         self.environment_state.step_counter += 1
         self.boat.set_state(boat_state, self.environment_state)
-        self.boat.calculate_forces(self.environment_state)
         return self.boat.calculate_state_delta(self.environment_state)
-
