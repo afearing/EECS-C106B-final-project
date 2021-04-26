@@ -19,8 +19,6 @@ def main():
     plot_maneuvers(results, env, save=True)
 
 
-
-
 def plot_maneuvers(results, env, save = False):
     
 

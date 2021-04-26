@@ -11,13 +11,6 @@ from environment import *
 from forces import *
 from controller import *
 
-
-
-
-
-
-
-
 class Boat:
     """The class for the boat state"""
     def __init__(self, sim_params, env):
@@ -46,6 +39,7 @@ class Boat:
 
         self.forces = Forces(self, env)
         self.controller = Controller(sim_params, self, env)
+        self.sail_angle_reference = self.calculate_sail_angle_reference()
 
     def calculate_speed(self):
         return math.sqrt(self.vel_x**2 + self.vel_y**2)
@@ -56,13 +50,16 @@ class Boat:
     def calculate_forces(self, env):
         self.forces.calculate_forces(self, env)
 
-    def calculate_state_delta(self, env):
-        sail_angle_reference = self.calculate_sail_angle_reference()
-        rudder_angle_reference = self.controller.controll(self, env)
+    def calculate_state_delta(self, env, time):
+        rudder_angle_reference = self.controller.controll(self, env, time)
+        if not env.step_counter % int(self.sail_sampletime / self.controller.sample_time):
+            self.sail_angle_reference = self.calculate_sail_angle_reference()
+        sail_angle_reference = self.sail_angle_reference
+        # print('rudder ang ref: ', rudder_angle_reference)
 
 
         delta_pos_x = self.vel_x * math.cos(self.yaw) - self.vel_y * math.sin(self.yaw)
-        delta_pos_y = self.vel_y * math.cos(self.yaw) - self.vel_x * math.sin(self.yaw)
+        delta_pos_y = self.vel_y * math.cos(self.yaw) + self.vel_x * math.sin(self.yaw)
         delta_pos_z = self.vel_z
         delta_roll = self.roll_rate
         delta_pitch = self.pitch_rate * math.cos(self.roll) - self.yaw_rate * math.sin(self.roll)
@@ -77,7 +74,9 @@ class Boat:
         delta_yaw_rate = (self.forces.damping.yaw - self.forces.rudder_force.y * self.distance_cog_rudder + self.forces.sail_force.y * self.distance_cog_sail_pressure_point + self.forces.sail_force.x * math.sin(self.forces.true_sail_angle) * self.distance_mast_sail_pressure_point + self.forces.lateral_force.y * (self.distance_cog_keel_pressure_point * (1-self.forces.lateral_force.separation) + self.distance_cog_keel_middle * self.forces.lateral_force.separation))/ self.moi_z
 
         delta_rudder = -2 * (self.rudder_angle - rudder_angle_reference)
+        # print(self.rudder_angle, rudder_angle_reference, 'rudder ang rudder ang ref')
         delta_rudder = np.clip(delta_rudder, -self.max_rudder_speed, self.max_rudder_speed)
+        # print(delta_rudder, self.max_rudder_speed, np.abs(delta_rudder) - self.max_rudder_speed)
         delta_sail = -0.1 * (self.forces.true_sail_angle - sail_angle_reference)
         delta_sail = np.clip(delta_sail, -self.max_sail_speed, self.max_sail_speed)
         delta = np.array([  delta_pos_x,     delta_pos_y,      delta_pos_z,
@@ -107,7 +106,7 @@ class Boat:
         wind_speed = self.forces.apparent_wind.apparent_speed
         opt_aoa = math.sin(wind_angle)/ (math.cos(wind_angle) + 0.4 * math.cos(wind_angle)**2) * self.sail_stretching / 4
         if abs(opt_aoa) > self.stall_deg/180*math.pi:
-            opt_aoa = np.sign(wind_angle * self.stall_deg/180*math.pi)
+            opt_aoa = np.sign(wind_angle) * self.stall_deg/180*math.pi
         if wind_speed > self.limit_wind_speed:
             fact = (self.limit_wind_speed / wind_speed)**2
             opt_aoa *= fact

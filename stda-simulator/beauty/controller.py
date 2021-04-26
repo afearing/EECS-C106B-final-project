@@ -40,35 +40,44 @@ class Controller:
         self.heading = Path(boat, env)
         self.rudder_angle = boat.rudder_angle # set initial value
         
-    def controll(self, boat, env):
-        if not env.step_counter % int(self.sail_sampletime / self.sample_time):
-            drift_angle = boat.calculate_drift()
-            speed = boat.calculate_speed()
+    def controll(self, boat, env, time):
+        drift_angle = boat.calculate_drift()
+        speed = boat.calculate_speed()
 
-            heading_error = self.heading.get_desired_heading() - boat.yaw
-            # respect to periodicity of angle: maximum difference is 180 deg resp. pi
-            while heading_error > math.pi:
-                heading_error -= 2*math.pi
-            while heading_error < -math.pi:
-                heading_error += 2*math.pi
-            self.summed_error += self.sample_time * (heading_error -  drift_angle)
-            # avoid high gains at low speed (singularity)
-            if speed < self.speed_adaptation:
-                speed = self.speed_adaptation
+        heading_error = self.heading.get_desired_heading(time) - boat.yaw
+        # print(heading_error)
+        # respect to periodicity of angle: maximum difference is 180 deg resp. pi
+        while heading_error > math.pi:
+            heading_error -= 2*math.pi
+        while heading_error < -math.pi:
+            heading_error += 2*math.pi
 
-            factor2 = -1.0 / self.factor / speed**2 / math.cos(boat.roll)
+        # TODO: check this sample time number
+        self.summed_error += self.sample_time * (heading_error -  drift_angle)
+        # avoid high gains at low speed (singularity)
+        if speed < self.speed_adaptation:
+            speed = self.speed_adaptation
 
-            #control equation
-            rudder_angle = factor2 * (self.KP * heading_error + self.KI * self.summed_error - self.KD * boat.yaw_rate)
-            if abs(rudder_angle) > boat.max_rudder_angle:
-                rudder_angle = np.clip(rudder_angle, -boat.max_rudder_angle, boat.max_rudder_angle)
-                self.summed_error = (rudder_angle/factor2 - (self.KP * heading_error - self.KD * boat.yaw_rate)) / self.KI
-            self.rudder_angle = rudder_angle
+        factor2 = -1.0 / self.factor / speed**2 / math.cos(boat.roll)
+
+        #control equation
+        rudder_angle = factor2 * (self.KP * heading_error + self.KI * self.summed_error - self.KD * boat.yaw_rate)
+        if abs(rudder_angle) > boat.max_rudder_angle:
+            rudder_angle = np.clip(rudder_angle, -boat.max_rudder_angle, boat.max_rudder_angle)
+            self.summed_error = (rudder_angle/factor2 - (self.KP * heading_error - self.KD * boat.yaw_rate)) / self.KI
+        self.rudder_angle = rudder_angle
+        # print(self.rudder_angle)
         return self.rudder_angle 
 
 
 class Path:
     def __init__(self, boat, env):
-        self.desired_heading = 0.5*math.pi # for testing
-    def get_desired_heading(self):
-        return self.desired_heading
+        self.desired_heading = 0.0*math.pi # for testing
+    def get_desired_heading(self, time):
+        if time < 50:
+            return 0
+        elif time < 100:
+            return np.pi/4
+        else:
+            return np.pi/2
+        # return self.desired_heading
