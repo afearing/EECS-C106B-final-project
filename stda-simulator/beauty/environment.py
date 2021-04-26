@@ -18,5 +18,5 @@ class Environment:
 
         self.time = 0
         self.step_counter = 0
-        self.wind_x = self.wind_strength * math.cos(self.wind_direction)
-        self.wind_y = self.wind_strength * math.sin(self.wind_direction)
+        self.wind_x = self.wind_strength * math.cos(math.radians(self.wind_direction)) # change to degrees
+        self.wind_y = self.wind_strength * math.sin(math.radians(self.wind_direction))
