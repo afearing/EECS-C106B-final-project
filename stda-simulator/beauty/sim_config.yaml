@@ -22,7 +22,7 @@ boat: {
         
         
         rudder_angle: 1,      # [rad]
-        sail_angle:   0.83775804095, # 48*pi/180     # [rad]
+        sail_angle:   1, # 48*pi/180     # [rad]
     },
     boat_dimensions: {
 
@@ -75,7 +75,7 @@ boat: {
     },
     controller: { 
         speed_adaptation: 0.3,
-        sail_sampletime: 5 # sample time for the sail controller? like every 5th timestep or something idk
+        sail_sampletime: 2 # sample time for the sail controller? like every 5th timestep or something idk
     #     KP: 0.5,  # calculated in controller class
     #     KI: 0.1,  # calculated in controller class
     #     KD: 0.9   # calculated in controller class

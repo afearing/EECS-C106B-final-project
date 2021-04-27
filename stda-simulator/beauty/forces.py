@@ -163,7 +163,7 @@ class LateralForce:
         return: The force applied to the lateral plane of the boat
         '''
         pressure = (env.water_density / 2) * boat.calculate_speed()**2 * math.cos(boat.roll)**2
-        friction = 2.66 * math.sqrt(env.water_viscosity / (boat.calculate_speed() * boat.keel_length)) if boat.calculate_speed() else 0
+        friction = 2.66 * math.sqrt(env.water_viscosity / (boat.calculate_speed() * boat.keel_length)) if boat.calculate_speed() != 0 else 0
         #     aoa :           angle of attack
         # eff_aoa : effective angle of attack
         aoa = math.atan2(boat.vel_y, boat.vel_x)
@@ -172,7 +172,7 @@ class LateralForce:
             eff_aoa = math.pi + aoa
         elif aoa > math.pi / 2:
             eff_aoa = -math.pi + aoa
-        separation = 1- math.exp(-((abs(eff_aoa))/(math.pi/180*25))**2)
+        separation = 1- np.exp(-((abs(eff_aoa))/(math.pi/180*25))**2)
         tmp = -(friction + (4 * math.pi * eff_aoa**2 * separation) / boat.keel_stretching)
         separated_transverse_force = -np.sign(aoa) * pressure * boat.sail_area * math.sin(aoa)**2
 
@@ -196,22 +196,26 @@ class SailForce:
         aoa = apparent_wind.apparent_angle - true_sail_angle
         if aoa * true_sail_angle < 0:
             aoa = 0
+        eff_aoa = aoa
         if aoa < math.pi / 2:
             eff_aoa = math.pi + aoa
         else:
             eff_aoa = -math.pi + aoa
         pressure = (env.air_density / 2) * apparent_wind.apparent_speed**2 * math.cos(boat.roll * math.cos(true_sail_angle))**2
-        friction = 3.55 * math.sqrt(env.air_viscosity / (apparent_wind.apparent_speed * boat.sail_length)) if apparent_wind.apparent_speed else 0
+        friction = 3.55 * math.sqrt(env.air_viscosity / (apparent_wind.apparent_speed * boat.sail_length)) if apparent_wind.apparent_speed != 0 else 0
         separation = 1 - math.exp(-((abs(eff_aoa))/(math.pi/180*25))**2)
 
-        propulsion = (2 * math.pi * eff_aoa * math.sin(apparent_wind.apparent_angle) - (friction + (4 * math.pi * eff_aoa**2 * separation) / boat.sail_stretching) * math.cos  (apparent_wind.apparent_angle)) * boat.sail_area * pressure
+        propulsion = (2 * math.pi * eff_aoa * math.sin(apparent_wind.apparent_angle) \
+             - (friction + (4 * math.pi * eff_aoa**2 * separation) / boat.sail_stretching) * math.cos(apparent_wind.apparent_angle)) * boat.sail_area * pressure
 
-        transverse_force = (-2 * math.pi * eff_aoa * math.cos(apparent_wind.apparent_angle) - (friction + (4 * math.pi * eff_aoa**2 * separation) / boat.sail_stretching) *    math.sin(apparent_wind.apparent_angle)) * boat.sail_area * pressure
+        transverse_force = (-2 * math.pi * eff_aoa * math.cos(apparent_wind.apparent_angle) \
+            - (friction + (4 * math.pi * eff_aoa**2 * separation) / boat.sail_stretching) * math.sin(apparent_wind.apparent_angle)) * boat.sail_area * pressure
 
         separated_propulsion = np.sign(aoa) * pressure * boat.sail_area * math.sin(aoa)**2 * math.sin(true_sail_angle)
         separated_transverse_force = -np.sign(aoa) * pressure * boat.sail_area * math.sin(aoa)**2 * math.cos(true_sail_angle)
         self.x = (1 - separation) * propulsion + separation * separated_propulsion
-        self.y =(1 - separation) * transverse_force + separation * separated_transverse_force
+        self.y =(1 - separation) * transverse_force \
+             + separation * separated_transverse_force
         return self.x, self.y
 
 
