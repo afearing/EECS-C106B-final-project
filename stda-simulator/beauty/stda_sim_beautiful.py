@@ -15,19 +15,20 @@ def main():
         sim_params = yaml.safe_load(stream)
     # run the simulation
     sim = Simulator(sim_params)
-    results, env =  sim.simulate()
-    plot_maneuvers(results, env, save=True)
+    times, boat_states, rudder_desired, sail_desired, env =  sim.simulate()
+    plot_maneuvers(times, boat_states, rudder_desired, sail_desired, env, save=True)
 
 
-def plot_maneuvers(results, env, save = False):
+def plot_maneuvers(times, boat_states, rudder_desired, sail_desired, env, save = False):
     
 
-    t = results.t
+    t = times
 
     ref_heading = 0.5*math.pi * np.ones(t.shape) # change this later to use actual heading not hard coded in
 
+    fig_control, tmp = plot_time_fig(time=t, data=np.vstack((rudder_desired, sail_desired)), labels=['Rudder', 'Sail'], ax_labels=['Time', 'Angle'])
 
-    states = results.y
+    states = boat_states
     speeds = states[6:9]
     speed_axlabels = ['Time / s', 'Speed / m/s']
     speed_labels = ['Forward', 'Leeway', 'Vertical']
@@ -60,6 +61,7 @@ def plot_maneuvers(results, env, save = False):
         fig_ang.savefig('figs/angles.pdf')
         fig_speed.savefig('figs/speeds.pdf')
         fig_traj.savefig('figs/trajectories.pdf')
+        fig_control.savefig('figs/control.pdf')
 
 
 

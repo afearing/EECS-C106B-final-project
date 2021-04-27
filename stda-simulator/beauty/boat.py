@@ -38,8 +38,6 @@ class Boat:
         ### End Invariants
 
         self.forces = Forces(self, env)
-        self.controller = Controller(sim_params, self, env)
-        self.sail_angle_reference = self.calculate_sail_angle_reference()
 
     def calculate_speed(self):
         return math.sqrt(self.vel_x**2 + self.vel_y**2)
@@ -50,28 +48,22 @@ class Boat:
     def calculate_forces(self, env):
         self.forces.calculate_forces(self, env)
 
-    def calculate_state_delta(self, env, time):
-        rudder_angle_reference = self.controller.controll(self, env, time)
-        if not env.step_counter % int(self.sail_sampletime / self.controller.sample_time):
-            self.sail_angle_reference = self.calculate_sail_angle_reference()
-        sail_angle_reference = self.sail_angle_reference
-        # print('rudder ang ref: ', rudder_angle_reference)
-
+    def calculate_state_delta(self, env, time, rudder_angle_reference, sail_angle_reference):
 
         delta_pos_x = self.vel_x * math.cos(self.yaw) - self.vel_y * math.sin(self.yaw)
         delta_pos_y = self.vel_y * math.cos(self.yaw) + self.vel_x * math.sin(self.yaw)
         delta_pos_z = self.vel_z
-        delta_roll = self.roll_rate
+        delta_roll  = self.roll_rate
         delta_pitch = self.pitch_rate * math.cos(self.roll) - self.yaw_rate * math.sin(self.roll)
-        delta_yaw = self.yaw_rate * math.cos(self.roll) + self.pitch_rate * math.sin(self.roll)
+        delta_yaw   = self.yaw_rate * math.cos(self.roll) + self.pitch_rate * math.sin(self.roll)
 
         delta_vel_x = delta_yaw * self.vel_y + (self.forces.sail_force.x + self.forces.lateral_force.x + self.forces.rudder_force.x + self.forces.damping.x + self.forces.wave_impedance + self.forces.hydrostatic_force.x) / self.mass
         delta_vel_y = -delta_yaw * self.vel_x + ((self.forces.sail_force.y + self.forces.lateral_force.y + self.forces.rudder_force.y) * math.cos(self.roll) + self.forces.hydrostatic_force.y + self.forces.damping.y) / self.mass
         delta_vel_z = ((self.forces.sail_force.y + self.forces.lateral_force.y + self.forces.rudder_force.y) * math.sin(self.roll) + self.forces.hydrostatic_force.z - self.gravity_force + self.forces.damping.z) / self.mass
 
-        delta_roll_rate = (self.forces.hydrostatic_force.z * self.forces.hydrostatic_force.y_hs - self.forces.sail_force.y * self.sail_pressure_point_height + self.forces.damping.roll)/self.moi_x
+        delta_roll_rate  = (self.forces.hydrostatic_force.z * self.forces.hydrostatic_force.y_hs - self.forces.sail_force.y * self.sail_pressure_point_height + self.forces.damping.roll)/self.moi_x
         delta_pitch_rate = (self.forces.sail_force.x * self.sail_pressure_point_height - self.forces.hydrostatic_force.z * self.forces.hydrostatic_force.x_hs * math.cos(self.roll) + self.forces.damping.pitch - (self.moi_x - self.moi_z) * self.roll_rate * self.yaw_rate) / self.moi_y
-        delta_yaw_rate = (self.forces.damping.yaw - self.forces.rudder_force.y * self.distance_cog_rudder + self.forces.sail_force.y * self.distance_cog_sail_pressure_point + self.forces.sail_force.x * math.sin(self.forces.true_sail_angle) * self.distance_mast_sail_pressure_point + self.forces.lateral_force.y * (self.distance_cog_keel_pressure_point * (1-self.forces.lateral_force.separation) + self.distance_cog_keel_middle * self.forces.lateral_force.separation))/ self.moi_z
+        delta_yaw_rate   = (self.forces.damping.yaw - self.forces.rudder_force.y * self.distance_cog_rudder + self.forces.sail_force.y * self.distance_cog_sail_pressure_point + self.forces.sail_force.x * math.sin(self.forces.true_sail_angle) * self.distance_mast_sail_pressure_point + self.forces.lateral_force.y * (self.distance_cog_keel_pressure_point * (1-self.forces.lateral_force.separation) + self.distance_cog_keel_middle * self.forces.lateral_force.separation))/ self.moi_z
 
         delta_rudder = -2 * (self.rudder_angle - rudder_angle_reference)
         # print(self.rudder_angle, rudder_angle_reference, 'rudder ang rudder ang ref')
@@ -87,12 +79,16 @@ class Boat:
         return delta
         
     def set_state(self, boat_state, env):
-        self.pos_x,          self.pos_y,          self.pos_z    = boat_state[0:3]
-        self.roll,           self.pitch,          self.yaw      = boat_state[3:6]
-        self.vel_x,          self.vel_y,          self.vel_z    = boat_state[6:9]
-        self.roll_rate,      self.pitch_rate,     self.yaw_rate = boat_state[9:12]
-        self.rudder_angle,   self.sail_angle               = boat_state[12:14]
-        self.calculate_forces(env)
+        try:
+            self.pos_x,          self.pos_y,          self.pos_z    = boat_state[0:3]
+            self.roll,           self.pitch,          self.yaw      = boat_state[3:6]
+            self.vel_x,          self.vel_y,          self.vel_z    = boat_state[6:9]
+            self.roll_rate,      self.pitch_rate,     self.yaw_rate = boat_state[9:12]
+            self.rudder_angle,   self.sail_angle               = boat_state[12:14]
+            self.calculate_forces(env)
+        except Exception as e:
+            print('boat state: ', boat_state.shape, 'environment: ', env)
+            raise e 
     
     def get_state(self):
         return np.array([   self.pos_x,          self.pos_y,          self.pos_z,   
@@ -101,13 +97,3 @@ class Boat:
                             self.roll_rate,      self.pitch_rate,     self.yaw_rate,
                             self.rudder_angle,   self.sail_angle])
                             
-    def calculate_sail_angle_reference(self):
-        wind_angle = self.forces.apparent_wind.apparent_angle
-        wind_speed = self.forces.apparent_wind.apparent_speed
-        opt_aoa = math.sin(wind_angle)/ (math.cos(wind_angle) + 0.4 * math.cos(wind_angle)**2) * self.sail_stretching / 4
-        if abs(opt_aoa) > self.stall_deg/180*math.pi:
-            opt_aoa = np.sign(wind_angle) * self.stall_deg/180*math.pi
-        if wind_speed > self.limit_wind_speed:
-            fact = (self.limit_wind_speed / wind_speed)**2
-            opt_aoa *= fact
-        return abs(np.clip(wind_angle - opt_aoa, -math.pi/2, math.pi/2))
