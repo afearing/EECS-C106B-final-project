@@ -11,10 +11,8 @@ deq = solve
 def main():
     
     save=True
-    #save=False
     
     scenario_1(save=save)
-    scenario_0(save=save)
     
     plt.show()
 
@@ -25,8 +23,6 @@ def deq_sparse(time, state):
     diff[PITCH_RATE] = 0
     diff[ROLL_RATE] = 0
     return diff
-    
-
     
 def init_data_arrays(n_states, N_steps, x0):
     x = zeros((n_states, N_steps+1))
@@ -50,15 +46,8 @@ def init_integrator(x0, sampletime, sparse=False):
     return integrator, controller
 
 def scenario_1(save=False):
-    n_states = 12
-    if actor_dynamics:
-        n_states = 14
-    #def set_environment():
-    ## environment
-    #wind = TrueWind(0, 3, 3, pi/2)
+    n_states = 14
     wind = TrueWind(0, 5, 5, pi/2)
-    #wind = TrueWind(0, 2, 2, pi/2) 
-    #wind = TrueWind(0, 0, 0, pi/2) 
     environment[SAIL_ANGLE] = 0. /180 * pi
     environment[RUDDER_ANGLE] = 0
     environment[WAVE] = Wave(50, 0, 0)
@@ -67,40 +56,26 @@ def scenario_1(save=False):
         environment[WAVE] = Wave(length=100., amplitude=.5, direction=0)
         append = "_wave"
     else:
-        
         append = ""
     environment[TRUE_WIND] = wind
     
     # simulation params
     t_end = 150.
-    #t_end = 57.
     sampletime = .3
     sail_sampletime = 2.
     N_steps = int(t_end / sampletime)
     # initial values
     x0 = zeros(n_states)
     x0[VEL_X] = 0.
-    
-    if actor_dynamics:
-        x0[SAIL_STATE] = 48*pi/180
+    x0[SAIL_STATE] = 48*pi/180
     
     x, t, r, sail, ref_heading = init_data_arrays(n_states, N_steps, x0)
     
-    if True:
-        x2, t2, r2, sail2, ref_heading = init_data_arrays(n_states, N_steps, x0)
-    
-    
     integrator, controller = init_integrator(x0, sampletime)
-    integrator2 = simple_integrator(deq_sparse)
-    integrator2.set_initial_value(x0, 0)
-    
     
     ref_heading[int(40/sampletime):] = 1.2*pi
-    
 
-    
     ref_heading[int(90/sampletime) :] = .35 * pi
-
 
     sail_angle = None
     
@@ -125,7 +100,6 @@ def smooth_reference(ref_heading, n_filter=5):
 def comp_route(x, x2):
     fig_traj, ax_traj = plot_series(x[POS_X, :], x[POS_Y, :], xlabel='$x$ / m', ylabel='$y$ / m')
     fig_traj, ax_traj = plot_series(x2[POS_X, :], x2[POS_Y, :], xlabel='$x$ / m', ylabel='$y$ / m', fig=fig_traj, ax=ax_traj)
-    
     
 
 def plots_manoevers(t, x, r, sail, ref_heading, save, sail_force=None, keel_force=None, separation=None, wind=None, append=""):
@@ -175,88 +149,6 @@ def plot_time_fig(time, data, labels, ax_labels, scale=1., ticks=None):
             ax.set_yticks(np.arange(9)*45)
     return fig, ax
 
-def plot_old():
-    
-    fig_vx, tmp = plot_series(t, x[VEL_X, :], xlabel='time /s', ylabel='speed $x$ / m/s')
-    fig_vy, tmp = plot_series(t, x[VEL_Y, :], xlabel='time /s', ylabel='speed $y$ / m/s')
-    fig_heading, ax_heading = plot_series(t, (x[YAW, :]/pi*180) % 360, xlabel='time /s', ylabel='heading / deg')
-    
-    drift = drift = arctan2(x[VEL_Y, :], x[VEL_X, :])
-    fig_heading, ax_heading = plot_series(t, ref_heading/pi*180, xlabel='time /s', ylabel='heading / deg', fig=fig_heading, ax=ax_heading)
-    fig_heading, ax_heading = plot_series(t, drift/pi*180, xlabel='time /s', ylabel='heading / deg', fig=fig_heading, ax=ax_heading)
-    
-    
-    fig_r, ax_r = plot_series(t, r/pi*180, xlabel='time /s', ylabel='rudder / deg')
-    if actor_dynamics:
-        fig_r, ax_r = plot_series(t, x[12,:]/pi*180, xlabel='time /s', ylabel='rudder / deg', fig=fig_r, ax=ax_r)
-    #plot_series(t, x[ROLL,:]/pi*180, xlabel='time /s', ylabel='rudder / deg', fig=fig_r, ax=ax_r)
-    fig_sail, ax_sail = plot_series(t, sail/pi*180, xlabel='time /s', ylabel='sail angle / deg')
-    if actor_dynamics:
-        plot_series(t, x[13,:]/pi*180, xlabel='time /s', ylabel='sail angle / deg', fig=fig_sail, ax=ax_sail)
-    fig_traj, ax_traj = plot_series(x[POS_X, :], x[POS_Y, :], xlabel='$x_g$ / m', ylabel='$y_g$ / m')
-    
-    plot_arrows(x[POS_X, :], x[POS_Y, :], x[YAW, :], fig=fig_traj, ax=ax_traj, color='red')
-    #dir = arctan2(x[VEL_Y, :], x[VEL_X, :]) + x[YAW, :]
-    #plot_arrows(x[POS_X, :], x[POS_Y, :], dir, fig=fig_traj, ax=ax_traj, color='k')
-    fig_pitch, tmp = plot_series(t, x[PITCH, :]/pi*180, xlabel='time /s', ylabel='pitch in deg')
-    fig_roll, tmp = plot_series(t, x[ROLL, :]/pi*180, xlabel='time /s', ylabel='roll in deg')
-    
-    if sail_force is not None:
-        plot_series(t, sail_force[1, :], ylabel='sailforce y')
-        plot_series(t, keel_force[1, :], ylabel='keelforce y')
-        plot_series(t, separation, ylabel='separation')
-        
-    if save: 
-        fig_heading.savefig('figs/heading.eps')
-        fig_vx.savefig('figs/speed.eps')
-        fig_vy.savefig('figs/leeway_speed.eps')
-        fig_r.savefig('figs/rudder.eps')
-        fig_sail.savefig('figs/sail.eps')
-        fig_traj.savefig('figs/trajectories.eps')
-        
-        fig_pitch.savefig('figs/pitch.eps')
-        fig_roll.savefig('figs/roll.eps')
-        
-        
-        
-def scenario_0(save=False):
-    n_states = 12
-    if actor_dynamics:
-        n_states = 14
-    ## environment
-    wind = TrueWind(0, 6, 6, pi/2) 
-    #wind = TrueWind(0, 0, 0, pi/2) 
-    environment[SAIL_ANGLE] = 0. /180 * pi
-    environment[RUDDER_ANGLE] = 0
-    #environment[WAVE] = Wave(50, 0, 1)
-    environment[WAVE] = Wave(50, 0, 0)
-    environment[TRUE_WIND] = wind
-    
-    # simulation params
-    t_end = 3.
-    #t_end = 57.
-    sampletime = .01
-    sail_sampletime = 5.
-    N_steps = int(t_end / sampletime)
-    # initial values
-    x0 = zeros(n_states)
-    x0[VEL_X] = 0.
-    if actor_dynamics:
-        x0[SAIL_STATE] = 48*pi/180
-    
-    x, t, r, sail, ref_heading = init_data_arrays(n_states, N_steps, x0)
-    integrator, controller = init_integrator(x0, sampletime)
-    sail_angle = np.ones(N_steps) * 48*pi/180 # set_predefined_sail_angle()
-    
-    x, t, separation, keel, sail_force, sail, r = simulate(N_steps, x, t, r, sail, environment, 
-                                                           controller, integrator, sampletime, sail_sampletime, ref_heading, wind, sail_angle)
-    
-    
-    fig, tmp = plot_leeways(t, separation, x[VEL_X], x[VEL_Y])
-    if save:
-        fig.savefig('figs/leeways.eps')
-
-    
 def plot_leeways(t, separation, vx, vy):
     ax, fig = None, None
     fig, ax = plot_series(t, vx, xlabel='Time /s', label='Forward speed in $m/s$', ax=ax, fig=fig)
@@ -321,29 +213,6 @@ def simulate(N_steps, x, t, r, sail, environment, controller, integrator, sample
         
     return x, t, separation, keel, sail_force, sail, r
 
-class simple_integrator(object):
-    
-    def __init__(self, deq):
-        
-        self.t = 0
-        self.deq = deq
-        self.max_sample_time = .01
-        pass
-    
-    def set_initial_value(self, x0, t0):
-        
-        self.y = x0
-        self.t = t0
-        
-    def integrate(self, end_time):
-        while end_time - self.t > 1.1 * self.max_sample_time:
-            self.integrate(self.t + self.max_sample_time)
-            
-        
-        
-        self.y += self.deq(self.t, self.y) * (end_time - self.t)
-        self.t = end_time
-    
 def plot_arrows(x, y, directions, fig=None, ax=None, color=None):
     if fig is None:
         fig = plt.figure()
@@ -353,12 +222,9 @@ def plot_arrows(x, y, directions, fig=None, ax=None, color=None):
         color = 'k'
     
     length = mean(abs(x[1:]-x[:-1]))
-    #length = .2
     
     for i in range(x.shape[0]):
         ax.arrow(x[i], y[i], length*cos(directions[i]), length*sin(directions[i]), head_width=.05, head_length=.1, fc=color, ec=color)
-    
-
     
 def plot_series(x, y, fig=None, ax=None, N_subplot=1, n_subplot=1, title=None, xlabel=None, ylabel=None, label=None, legend=False):
     if fig is None:
