@@ -13,7 +13,7 @@ boat: {
 
         roll:  0, # maybe radians?
         pitch: 0,
-        yaw:   0,
+        yaw:   0.1,
 
 
         roll_rate:  0, # maybe radians per second?
@@ -22,7 +22,7 @@ boat: {
         
         
         rudder_angle: 1,      # [rad]
-        sail_angle:   1, # 48*pi/180     # [rad]
+        sail_angle:   0.837, # 48*pi/180     # [rad]
     },
     boat_dimensions: {
 
@@ -84,7 +84,6 @@ boat: {
 }
 
 
-
 environment: {
     properties: {
         water_viscosity: 0.0000001, # [Pa * s]
@@ -98,9 +97,9 @@ environment: {
         wind_strength:   5.0,  # [m/s] 5.0 m/s ~= 4-5 bft
         wind_direction:  45.0, # [deg] wind from north-north-east
         waves:          True,   # whether waves are enabled
-        wave_direction: 220.0,  # [deg] unused, keep for the future
-        wave_length:      2.0,  # [m]   unused
-        wave_amplitude:   0.0,  # [m]   unused
+        wave_direction: 0,  # [deg] keep for the future
+        wave_length:      100.0,  # [m] 
+        wave_amplitude:   0.5,  # [m] 
     },
 }
 
