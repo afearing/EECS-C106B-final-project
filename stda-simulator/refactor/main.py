@@ -22,7 +22,8 @@ def main():
 
     sim = Simulator(sim_params)
 
-    path = Path()
+    path = Path(sim)
+    path.plan_path()
     controller = Controller(sim_params, sim.boat, sim.env)
 
     sim.set_path(path)
@@ -36,6 +37,12 @@ def main():
 def plots_manoevers(t, x, r, sail, ref_heading, save=False, sail_force=None, keel_force=None, separation=None, wind=None, append=""):
     # plots
     
+
+    controls = [np.rad2deg(sail), np.rad2deg(r)]
+    control_axlabels = ['Time', 'Angle (Deg)']
+    control_lables = ['Sail Angle', 'Rudder Angle']
+    fig_control, tmp = plot_time_fig(time=t, data=controls, labels=control_lables, ax_labels=control_axlabels)
+
     speeds = [x[VEL_X, :], x[VEL_Y, :], x[VEL_Z, :]]
     speed_axlabels = ['Time / s', 'Speed / m/s']
     speed_labels = ['Forward', 'Leeway', 'Vertical']

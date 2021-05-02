@@ -54,13 +54,20 @@ class Simulator:
             else:
                 self.rudder_ang_ref = 0
                 self.sail_angle_ref = 0
-                
+            
             # Integrate to next time step
             self.integrator.integrate(self.integrator.t + self.stepsize)
             times[step_i + 1] = self.integrator.t 
             boat_states[step_i + 1] = self.integrator.y
+            rudder_ang_refs[step_i + 1] = self.rudder_ang_ref
+            sail_ang_refs[step_i + 1] = self.sail_angle_ref
 
             self.boat.set_state(boat_states[step_i + 1])
+            if self.boat.yaw < -np.pi:
+                self.boat.yaw += 2*np.pi
+            elif self.boat.yaw > np.pi:
+                self.boat.yaw -= 2*np.pi
+
         return times, boat_states, rudder_ang_refs, sail_ang_refs, yaw_desireds
 
     def __solve(self, time, boat_state):

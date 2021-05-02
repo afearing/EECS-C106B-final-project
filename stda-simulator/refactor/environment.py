@@ -27,6 +27,9 @@ class Environment:
             strength = self.wind_strength, direction = self.wind_direction
         )
 
+        if not self.waves:
+            self.wave_amplitude = 0
+
         self.wave = Wave(
             length = self.wave_length,
             direction = self.wave_direction,
