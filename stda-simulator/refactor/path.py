@@ -7,8 +7,8 @@ class Path:
 
         self.yaw_desireds = None
         self.last_plan_time = None
-        self.replan_interval = 50 # Replan every replan_interval seconds
-        self.planning_horizon = 500 # Plan planning_horizon steps into the future, at self.sim.stepsize second length steps
+        self.replan_interval = 50 # Replan every replan_interval seconds. Must be less than or equal to planning horizon.
+        self.planning_horizon = 50 # Plan planning_horizon seconds into the future
 
     
     def yaw(self, time):
@@ -40,10 +40,10 @@ class Path:
     
     def plan_path(self):
 
-        n_steps = self.planning_horizon
         dt = self.sim.stepsize
+        n_steps = int(self.planning_horizon/dt)
         q_start = np.array([self.sim.boat.pos_x, self.sim.boat.pos_y, self.sim.boat.yaw])
-        q_goal = np.array([100, 40, np.pi/4])
+        q_goal = np.array([0, 100, np.pi/2])
 
         # Assuming a constant speed over the entire trajectory for now.
         # 0.8 number was experimentally determined from the stable speed the boat tends to go at
