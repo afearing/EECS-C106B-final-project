@@ -13,7 +13,7 @@ boat: {
 
         roll:  0, # maybe radians?
         pitch: 0,
-        yaw:   0,
+        yaw:   0.1,
 
 
         roll_rate:  0, # maybe radians per second?
@@ -22,7 +22,7 @@ boat: {
         
         
         rudder_angle: 1,      # [rad]
-        sail_angle:   0.83775804095, # 48*pi/180     # [rad]
+        sail_angle:   0.837, # 48*pi/180     # [rad]
     },
     boat_dimensions: {
 
@@ -75,14 +75,13 @@ boat: {
     },
     controller: { 
         speed_adaptation: 0.3,
-        sail_sampletime: 5 # sample time for the sail controller? like every 5th timestep or something idk
+        sail_sampletime: 2 # sample time for the sail controller? like every 5th timestep or something idk
     #     KP: 0.5,  # calculated in controller class
     #     KI: 0.1,  # calculated in controller class
     #     KD: 0.9   # calculated in controller class
     }
 
 }
-
 
 
 environment: {
@@ -97,10 +96,10 @@ environment: {
     disturbances: {
         wind_strength:   5.0,  # [m/s] 5.0 m/s ~= 4-5 bft
         wind_direction:  45.0, # [deg] wind from north-north-east
-        waves:          True,   # whether waves are enabled
-        wave_direction: 220.0,  # [deg] unused, keep for the future
-        wave_length:      2.0,  # [m]   unused
-        wave_amplitude:   0.0,  # [m]   unused
+        waves:          False,   # whether waves are enabled
+        wave_direction: 0,  # [deg] keep for the future
+        wave_length:      100.0,  # [m] 
+        wave_amplitude:   0.5,  # [m] 
     },
 }
 
@@ -108,7 +107,7 @@ simulator: {
     # time controls
     stepsize:          0.1, # [s]  how far into the future to simulate
     clockrate:          10, # [Hz] how often to simulate
-    t_end:              180, # [s] how long to simulate
+    t_end:              200, # [s] how long to simulate
 }
 
 ...
