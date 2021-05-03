@@ -4,31 +4,55 @@ import casadi
 class Path:
     def __init__(self, simulator):
         self.sim = simulator
+
+        self.yaw_desireds = None
+        self.last_plan_time = None
+        self.replan_interval = 50 # Replan every replan_interval seconds
+        self.planning_horizon = 500 # Plan planning_horizon steps into the future, at self.sim.stepsize second length steps
+
     
     def yaw(self, time):
-        if time < 40:
-            return 0.0
-        elif time < 90:
-            return np.pi/4
-        # elif time < 100:
+        if self.yaw_desireds is None:
+            plan, u = self.plan_path()
+            self.yaw_desireds = plan[2, :]
+            self.last_plan_time = time
+        
+        
+        if self.last_plan_time + self.replan_interval < time:
+            print('replanning at time: ', time)
+            plan, u = self.plan_path()
+            print('replanned')
+            self.yaw_desireds = plan[2, :]
+            self.last_plan_time = time
+
+        index = int((time - self.last_plan_time) / self.sim.stepsize)
+        return self.yaw_desireds[index]
+        
+        # if time < 40:
+        #     return 0.0
+        # elif time < 90:
         #     return np.pi/4
-        else:
-            return np.pi/2
+        # # elif time < 100:
+        # #     return np.pi/4
+        # else:
+        #     return 0
         # return 0
     
     def plan_path(self):
 
-        n_steps = 1000
+        n_steps = self.planning_horizon
         dt = self.sim.stepsize
         q_start = np.array([self.sim.boat.pos_x, self.sim.boat.pos_y, self.sim.boat.yaw])
-        q_goal = np.array([40, 40, np.pi/4])
+        q_goal = np.array([100, 40, np.pi/4])
 
         # Assuming a constant speed over the entire trajectory for now.
         # 0.8 number was experimentally determined from the stable speed the boat tends to go at
-        # speed = np.sqrt(self.sim.boat.vel_x**2 + self.sim.boat.vel_y**2)
-        # speed = (speed + 0.8)/2
-        speed_x = self.sim.boat.vel_x
+        speed_x = self.sim.boat.vel_x 
         speed_y = self.sim.boat.vel_y
+        # speed_x = 0.4 # (self.sim.boat.vel_x + 0.1)/2
+        # speed_y = 0.4 # (self.sim.boat.vel_y + 0.1)/2
+        # speed_x = (self.sim.boat.vel_x + 0.4)/2
+        # speed_y = (self.sim.boat.vel_y + 0.4)/2
 
         opti = casadi.Opti()
 
@@ -39,8 +63,8 @@ class Path:
         q = opti.variable(3, n_steps+1)
         u = opti.variable(1, n_steps)
 
-        Q = np.diag([1, 1, 0.1])
-        R = 2*np.diag([1])
+        Q = np.diag([10, 10, 0.1])
+        R = np.diag([0.1])
         P = n_steps * Q
 
         # Create warm start
@@ -59,17 +83,17 @@ class Path:
             ui = u[:, i]
             obj += (qi - q_goal).T @ Q @ (qi-q_goal) + ui.T @ R @ ui
         q_last = q[:, n_steps]
-        obj += (q_last - q_goal).T @ P @ (q_last - q_goal)
+        obj += (q_last - q_goal).T @ Q @ (q_last - q_goal)
 
         opti.minimize(obj)
 
         # Setup constraints
         constraints = []
         # (x, y) bounds
-        constraints.extend([-50 <= q[0, :], q[0, :] <= 50,
-                            -50 <= q[1, :], q[1, :] <= 50])
-        # Input constraints (restrict rate of change of yaw)
-        constraints.extend([-100 <= u[0, :], u[0, :] <= 100])
+        # constraints.extend([-50 <= q[0, :], q[0, :] <= 50,
+        #                     -50 <= q[1, :], q[1, :] <= 50])
+        # # Input constraints (restrict rate of change of yaw)
+        constraints.extend([-0.1 <= u[0, :], u[0, :] <= 0.1])
         # Dynamic constraints
         def dynamics_model(q, u):
             def qdot(q, u):
@@ -92,15 +116,17 @@ class Path:
         
         # Initial and final state constraints
         constraints.append(q[:, 0] == q_start)
-        constraints.append(q[:, -1] == q_goal)
+        # constraints.append(q[:, -1] == q_goal)
 
         opti.subject_to(constraints)
 
         # Solve
-        p_opts = {"expand": False}
-        s_opts = {"max_iter": 1e4}
+        p_opts = {"expand": True, "print_time": 0}
+        s_opts = {"max_iter": 1e4, "print_level": 0}
         opti.solver('ipopt', p_opts, s_opts)
 
         sol = opti.solve()
+
+        return sol.value(q), sol.value(u)
 
 

@@ -23,7 +23,26 @@ def main():
     sim = Simulator(sim_params)
 
     path = Path(sim)
-    path.plan_path()
+    # plan, u = path.plan_path()
+    # plot_series(plan[0, :], plan[1, :], xlabel='x', ylabel='y')
+
+    # plt.figure()
+    # plt.plot(np.rad2deg(plan[2, :]))
+    # plt.title('yaw plan')
+    # plt.legend(['yaw'])
+
+    # plt.figure()
+    # plt.title('u')
+    # plt.plot(u)
+    # plt.legend(['u'])
+
+    # plt.figure()
+    # plt.title('xy plan')
+    # plt.plot(plan[0, :])
+    # plt.plot(plan[1, :])
+
+    # print(plan[:, 0], plan[:, -1])
+
     controller = Controller(sim_params, sim.boat, sim.env)
 
     sim.set_path(path)
@@ -37,6 +56,7 @@ def main():
 def plots_manoevers(t, x, r, sail, ref_heading, save=False, sail_force=None, keel_force=None, separation=None, wind=None, append=""):
     # plots
     
+    print('time: ', t[-1])
 
     controls = [np.rad2deg(sail), np.rad2deg(r)]
     control_axlabels = ['Time', 'Angle (Deg)']

@@ -16,9 +16,6 @@ class Simulator:
         self.path = path
         self.env = Environment(sim_params['environment'])
         self.boat = Boat(sim_params, self.env)
-        self.integrator = scipy.integrate.ode(self.__solve)
-        self.integrator.set_integrator('dopri5')
-        self.integrator.set_initial_value(self.boat.get_state(), 0)
 
     def set_controller(self, controller):
         self.controller = controller
@@ -39,6 +36,7 @@ class Simulator:
 
 
         for step_i in range(num_steps):
+            print('iteration: ', step_i)
             time = step_i * self.stepsize
             
             # Compute rudder control input
@@ -56,9 +54,9 @@ class Simulator:
                 self.sail_angle_ref = 0
             
             # Integrate to next time step
-            self.integrator.integrate(self.integrator.t + self.stepsize)
-            times[step_i + 1] = self.integrator.t 
-            boat_states[step_i + 1] = self.integrator.y
+            sol = scipy.integrate.solve_ivp(self.__solve, (time, time+self.stepsize), self.boat.get_state())
+            times[step_i + 1] = sol.t[-1]
+            boat_states[step_i + 1] = sol.y[:, -1]
             rudder_ang_refs[step_i + 1] = self.rudder_ang_ref
             sail_ang_refs[step_i + 1] = self.sail_angle_ref
 

@@ -107,7 +107,7 @@ simulator: {
     # time controls
     stepsize:          0.1, # [s]  how far into the future to simulate
     clockrate:          10, # [Hz] how often to simulate
-    t_end:              180, # [s] how long to simulate
+    t_end:              200, # [s] how long to simulate
 }
 
 ...
