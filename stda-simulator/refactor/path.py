@@ -43,16 +43,12 @@ class Path:
         dt = self.sim.stepsize
         n_steps = int(self.planning_horizon/dt)
         q_start = np.array([self.sim.boat.pos_x, self.sim.boat.pos_y, self.sim.boat.yaw])
-        q_goal = np.array([0, 100, np.pi/2])
+        q_goal = np.array([40, 40, np.pi/4])
 
         # Assuming a constant speed over the entire trajectory for now.
         # 0.8 number was experimentally determined from the stable speed the boat tends to go at
         speed_x = self.sim.boat.vel_x 
         speed_y = self.sim.boat.vel_y
-        # speed_x = 0.4 # (self.sim.boat.vel_x + 0.1)/2
-        # speed_y = 0.4 # (self.sim.boat.vel_y + 0.1)/2
-        # speed_x = (self.sim.boat.vel_x + 0.4)/2
-        # speed_y = (self.sim.boat.vel_y + 0.4)/2
 
         opti = casadi.Opti()
 
@@ -65,7 +61,7 @@ class Path:
 
         Q = np.diag([10, 10, 0.1])
         R = np.diag([0.1])
-        P = n_steps * Q
+        P = (n_steps / 5) * Q
 
         # Create warm start
         q0 = np.zeros((3, n_steps + 1))
@@ -100,6 +96,10 @@ class Path:
                 x = q[0]
                 y = q[1]
                 yaw = q[2]
+
+                # speed = (1/2)*(1 - casadi.cos(yaw - self.sim.env.true_wind.direction))
+                # speed_x = speed*casadi.cos(yaw)
+                # speed_y = speed*casadi.sin(yaw)
                 
                 xdot = speed_x*casadi.cos(yaw) - speed_y*casadi.sin(yaw)
                 ydot = speed_x*casadi.sin(yaw) + speed_y*casadi.cos(yaw)

@@ -50,7 +50,7 @@ def main():
 
     times, boat_states, rudder_ang_refs, sail_ang_refs, yaw_desireds = sim.simulate()
 
-    plots_manoevers(times, boat_states.T, rudder_ang_refs, sail_ang_refs, yaw_desireds)
+    plots_manoevers(times, boat_states.T, rudder_ang_refs, sail_ang_refs, yaw_desireds, wind=sim.env.true_wind)
     plt.show()
 
 def plots_manoevers(t, x, r, sail, ref_heading, save=False, sail_force=None, keel_force=None, separation=None, wind=None, append=""):
@@ -80,7 +80,7 @@ def plots_manoevers(t, x, r, sail, ref_heading, save=False, sail_force=None, kee
     fig_traj, ax_traj = plot_series(x[POS_X, :], x[POS_Y, :], xlabel='$x_g$ / m', ylabel='$y_g$ / m')
     # plot_arrows(x[POS_X, :], x[POS_Y, :], x[YAW, :], fig=fig_traj, ax=ax_traj, color='red')
     ax_traj.plot(x[POS_X, 0], x[POS_Y, 0], 'xb', markersize=10)
-    # ax_traj.arrow(0, -25, wind.x, wind.y, head_width=1.5, head_length=3, width=.5, fc='green', ec='green')
+    ax_traj.arrow(0, -25, wind.x, wind.y, head_width=1.5, head_length=3, width=.5, fc='green', ec='green')
     ax_traj.legend(['route', 'start', 'wind'])
     ax_traj.set_aspect('equal', adjustable='box')
     
@@ -103,7 +103,7 @@ def plot_time_fig(time, data, labels, ax_labels, scale=1., ticks=None):
         
     if ticks is not None:
         if ticks == 'ang':
-            ax.set_yticks(np.arange(9)*45)
+            ax.set_yticks(np.arange(12)*45)
     return fig, ax
 
 def plot_arrows(x, y, directions, fig=None, ax=None, color=None):

@@ -18,9 +18,12 @@ class Environment:
             exec('self.' + key + '= val')
         for key, val in env_params['disturbances'].items():
             exec('self.' + key + '= val')
-        
-        self.wind_x = self.wind_strength * np.cos(np.deg2rad(self.wind_direction)) # change to degrees
-        self.wind_y = self.wind_strength * np.sin(np.deg2rad(self.wind_direction))
+
+        self.wave_direction = np.deg2rad(self.wave_direction)
+        self.wind_direction = np.deg2rad(self.wind_direction)
+
+        self.wind_x = self.wind_strength * np.cos(self.wind_direction)
+        self.wind_y = self.wind_strength * np.sin(self.wind_direction)
 
         self.true_wind = TrueWind(
             x = self.wind_x, y = self.wind_y,
