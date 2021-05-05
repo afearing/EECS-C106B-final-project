@@ -15,6 +15,7 @@
 \RequirePackage{siunitx}
 \RequirePackage{sidecap}
 \RequirePackage{caption}
+\RequirePackage{booktabs}
 \captionsetup[figure]{font = scriptsize, labelfont = scriptsize} % https://tex.stackexchange.com/questions/52132/beamer-change-size-of-figure-caption
 \setkeys{Gin}{width=1\linewidth}
 
@@ -83,74 +84,74 @@ Focus on robustness to environmental disturbances.
 
 \begin{frame}{Sailboats}
 \begin{columns}
-\column{0.4\linewidth}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.3\linewidth]{documents/figures/alves_sailboat.png}
-    \caption{Alves sailboat \cite{Alves2010}}
-    \label{fig:alves_sailboat}
-\end{figure}
+\column{0.5\linewidth}
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\linewidth]{documents/figures/alves_modes.png}
+    \includegraphics[width=\linewidth]{documents/figures/alves_modes.png}
     \caption{Modes of sailing \cite{Alves2010}}
     \label{fig:alves_modes}
 \end{figure}
-\column{0.4\linewidth}
+\column{0.5\linewidth}
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\linewidth]{documents/figures/alves_vpp.png}
+    \includegraphics[width=\linewidth]{documents/figures/alves_vpp.png}
     \caption{Velocity polar diagram \cite{Alves2010}}
     \label{fig:alves_velocity}
 \end{figure}
 \end{columns}
+\centerline{Sailboats trajectories depend on wind direction}
 \end{frame}
 
 \section{Progress}
 \begin{frame}{What we've done}
     
     
-        Evaluated two different simulators for unmanned surface vehicles
+    Evaluated two different simulators for unmanned surface vehicles:
+    
     \begin{columns}
     \column{0.5\linewidth}
-        USVSim \cite{Paravisi2019}
+        \centerline{\texttt{USVSim} \cite{Paravisi2019}}
         \begin{itemize}
             \item Ubuntu 16.04 + Kinetic ROS + Gazebo
-            \item 6 DoF
+            \item 6 DoF boat dynamics model.
             \item Waves, buoyancy, water currents, wind currents, thruster underwater, thruster above water, foil
             \item Too complicated, hard to extend
         \end{itemize}
     \column{0.5\linewidth}
-        stda-sailboat-sim \cite{Buehler2018}
+        \centerline{\texttt{stda-sailboat-sim} \cite{Buehler2018}}
         \begin{itemize}
             \item Python + Numpy + Matplotlib
-            \item 6 DoF
+            \item 6 DoF boat dynamics model.
             \item sail, keel, rudder force. Buoyancy force, wave resistance, damping forces.
             \item Good enough
         \end{itemize}
     \end{columns}
+    
+    \hfill\\
+    \hfill\\
+    Tested open loop control of sail and rudder angles in \texttt{stda-sailboat-sim}.
+    
+    \hfill\\
+    Reduced scope of project due to expected amount of software we will have to write for simulation.
+    
 \end{frame}
-\begin{frame}{What's working so far}
-\begin{columns}
-\column{0.5\linewidth}
-    \begin{figure}
-        \centering
-        \begin{subfigure}
-            \centering
-            \includegraphics{documents/figures/trajectories.eps}
-            \caption{Caption}
-            \label{fig:my_label}
-        \end{subfigure}
-        \begin{subfigure}
-            \centering
-            \includegraphics{documents/figures/trajectories.eps}
-            \caption{Caption}
-            \label{fig:my_label}
-        \end{subfigure}
-    \end{figure}
-\end{columns}
 
+
+
+\begin{frame}{What's working so far}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+    ref heading &\SI{0}{\radian} & \SI{0.5\pi}{\radian} \\
+    x-y trajectory & \includegraphics[width = 0.35\linewidth]{documents/figures/trajectories_ref0.eps} &
+    \includegraphics[width = 0.35\linewidth]{documents/figures/trajectories_0.5pi.eps} \\
+    heading angle & \includegraphics[width = 0.35\linewidth]{documents/figures/heading_ref0.eps} & 
+    \includegraphics[width = 0.35\linewidth]{documents/figures/heading_0.5pi.eps}
+    \end{tabular}
+    \caption{Simulator results with example reference headings}
+    \label{tab:plots}
+\end{table}
 \end{frame}
 
 
@@ -158,10 +159,36 @@ Focus on robustness to environmental disturbances.
 
 \begin{frame}{The game plan}
 
+\begin{enumerate}
+    \item Understand more how sailboats are typically steered.
+        \begin{itemize}
+            \item How rudder \& sail are used together.
+        \end{itemize}
+    \item Dig more into boat dynamical model.
+    \item Develop and test yaw controllers.
+        \begin{itemize}
+            \item \cite{Buehler2018} gives a simple PID yaw controller based on a linearization of a simplification of a 6DoF boat dynamics model.
+        \end{itemize}
+    \item Develop path planner.
+\end{enumerate}
+
 \end{frame}
+
 \begin{frame}{Roadblocks}
     
+    \begin{itemize}
+        \item Faced difficulties with using simulators.
+            \begin{itemize}
+                \item Now shifted to using \texttt{stda-sailboat-sim}.
+            \end{itemize}
+        \item Simulator code is half-baked and all over the place.
+            \begin{itemize}
+                \item Will have to do significant refactoring.
+                \item May have to extend simulator to allow disturbances such as gusts of wind.
+            \end{itemize}
+    \end{itemize}
 \end{frame}
+
 \begin{frame}{References}
     \printbibliography{}
 \end{frame}
