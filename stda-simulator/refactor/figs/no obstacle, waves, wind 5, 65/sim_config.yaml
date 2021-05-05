@@ -95,7 +95,7 @@ environment: {
     },
     disturbances: {
         wind_strength:   5.0,  # [m/s] 5.0 m/s ~= 4-5 bft
-        wind_direction:  10.0, # [deg] wind from north-north-east
+        wind_direction:  65.0, # [deg] wind from north-north-east
         waves:          True,   # whether waves are enabled
         wave_direction: 45,  # [deg] keep for the future
         wave_length:      100.0,  # [m] 

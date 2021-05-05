@@ -2,7 +2,7 @@ import numpy as np
 import casadi
 
 class Path:
-    def __init__(self, simulator):
+    def __init__(self, simulator, obstacle_list):
         self.sim = simulator
 
         self.yaw_desireds = None
@@ -10,14 +10,17 @@ class Path:
         self.replan_interval = 50 # Replan every replan_interval seconds
         self.planning_horizon = 500 # Plan planning_horizon steps into the future, at self.sim.stepsize second length steps
 
-    
+        #circular objects of form stacked in array as [x, y, radius] with (x,y) centers
+        self.object_list = obstacle_list
+
+
     def yaw(self, time):
         if self.yaw_desireds is None:
             plan, u = self.plan_path()
             self.yaw_desireds = plan[2, :]
             self.last_plan_time = time
-        
-        
+
+
         if self.last_plan_time + self.replan_interval < time:
             print('replanning at time: ', time)
             plan, u = self.plan_path()
@@ -27,7 +30,7 @@ class Path:
 
         index = int((time - self.last_plan_time) / self.sim.stepsize)
         return self.yaw_desireds[index]
-        
+
         # if time < 40:
         #     return 0.0
         # elif time < 90:
@@ -37,7 +40,7 @@ class Path:
         # else:
         #     return 0
         # return 0
-    
+
     def plan_path(self):
 
         n_steps = self.planning_horizon
@@ -47,7 +50,7 @@ class Path:
 
         # Assuming a constant speed over the entire trajectory for now.
         # 0.8 number was experimentally determined from the stable speed the boat tends to go at
-        speed_x = self.sim.boat.vel_x 
+        speed_x = self.sim.boat.vel_x
         speed_y = self.sim.boat.vel_y
         # speed_x = 0.4 # (self.sim.boat.vel_x + 0.1)/2
         # speed_y = 0.4 # (self.sim.boat.vel_y + 0.1)/2
@@ -89,10 +92,25 @@ class Path:
 
         # Setup constraints
         constraints = []
+
+        #object constraints
+        # x_centers = self.object_list[:, 0]
+        # y_centers = self.object_list[:, 1]
+        # radii = self.object_list[:, 2]
+        #
+        # for obstacle in range(len(self.object_list)):
+        #     for i in range(n_steps):
+        #         constraints.append((q[0,i] - x_centers[obstacle])**2 + (q[1, i] - y_centers[obstacle])**2 > radii[obstacle]**2)
+        if self.object_list is not None: 
+            for obj in self.object_list:
+                obj_x, obj_y, obj_r = obj
+                for t in range(q.shape[1]):
+                    constraints.append((q[0,t]- obj_x)**2 + (q[1,t] - obj_y)**2 >= obj_r**2)
+
         # (x, y) bounds
         # constraints.extend([-50 <= q[0, :], q[0, :] <= 50,
         #                     -50 <= q[1, :], q[1, :] <= 50])
-        # # Input constraints (restrict rate of change of yaw)
+        # Input constraints (restrict rate of change of yaw)
         constraints.extend([-0.1 <= u[0, :], u[0, :] <= 0.1])
         # Dynamic constraints
         def dynamics_model(q, u):
@@ -100,20 +118,20 @@ class Path:
                 x = q[0]
                 y = q[1]
                 yaw = q[2]
-                
+
                 xdot = speed_x*casadi.cos(yaw) - speed_y*casadi.sin(yaw)
                 ydot = speed_x*casadi.sin(yaw) + speed_y*casadi.cos(yaw)
                 yawdot = u
-                
+
                 return casadi.vertcat(xdot, ydot, yawdot)
             return q + qdot(q, u)*dt
-        
+
         for i in range(n_steps):
             q_i = q[:, i]
             q_ip1 = q[:, i+1]
             u_i = u[:, i]
             constraints.append(q_ip1 == dynamics_model(q_i, u_i))
-        
+
         # Initial and final state constraints
         constraints.append(q[:, 0] == q_start)
         # constraints.append(q[:, -1] == q_goal)
@@ -128,5 +146,3 @@ class Path:
         sol = opti.solve()
 
         return sol.value(q), sol.value(u)
-
-
