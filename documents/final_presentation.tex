@@ -125,15 +125,21 @@ Focus on robustness to environmental disturbances.
 \end{frame}
 
 \begin{frame}{6-DoF Model Axes}
-\begin{table}[h]
+\begin{columns}
+\column{0.5\linewidth}
+\begin{figure}
     \centering
-    \begin{tabular}{cc}
-         \includegraphics[width = 0.35\linewidth]{documents/figures/alves_frames.png} & \includegraphics[width = 0.35\linewidth]{documents/figures/alves_rpy.png} \\
-         Translation axes x-y-z           & Rotation axes roll-pitch-yaw \\
-    \end{tabular}
-    \caption{Axes}
-    \label{tab:fig_axes}
-\end{table}
+    \includegraphics[width = \linewidth, height = \textheight, keepaspectratio]{documents/figures/alves_rpy.png}
+    \caption{Sailboat axes~\cite{Alves2010}}
+    \label{fig:my_label}
+\end{figure}
+\column{0.5\linewidth}
+\begin{itemize}
+    \item  \(X_B\)-\(Y\)-\(z\) translation
+    \item Roll \-pitch-yaw rotation
+\end{itemize}
+\end{columns}
+
     
 \end{frame}
 
@@ -169,7 +175,7 @@ Focus on robustness to environmental disturbances.
 
 
 
-\begin{frame}{Rewriting Simulator}
+\begin{frame}{Refactoring Simulator}
 
     \texttt{stda-sailboat-sim} simulator appears to have been written just enough to satisfy the needs of the authors paper.
     
@@ -217,29 +223,105 @@ track the reference heading.
 
 \begin{frame}{Yaw Controller}
 
-The yaw controller is a PID controller from the same paper which developed the simulator and 
-model we are using\cite{Buehler2018}.
+    The yaw controller tracks a reference yaw by setting sail and rudder angles.
 
-This controller leverages the fact that there is an optimal angle for the sail based on wind direction to decouple the rudder and sail angle control.
+    \hfill\\
+    The yaw controller is implemented as per the same paper which developed the simulator and 
+    boat dynamics model we are using\cite{Buehler2018}.
+    
+    \hfill\\
+    This controller leverages the fact that there is an optimal angle for the sail based on wind direction to decouple the rudder and sail angle control.
+    
+    \hfill\\
+    Note that the inputs called here as `rudder angle' and `sail angle' are actually
+    inputs to a first order model that simulates delays in changing the rudder and sail angles,
+    which are actually boat state variables.
+    
+    \hfill\\
+    
+    
+\end{frame}
 
-\hfill\\
-Apparent wind is the wind relative to the boat (accounting for boat velocity).
+\begin{frame}{Yaw Controller}
 
-\hfill\\
-With \(\theta_{aw}\) being the angle of the apparent wind, sail angle is optimally set based on current boat yaw as 
-\begin{equation}
-    \theta_{\text{sail}} = \frac{\sin(\theta_{aw})}{\cos(\theta_{aw}) + 0.4\cos^2(\theta_{aw})}
-\end{equation}
-This is clipped based on sailboat limit.
+    Apparent wind is the wind relative to the boat (accounting for boat velocity).
+    
+    \hfill\\
+    With \(\theta_{aw}\) being the angle of the apparent wind, sail angle is optimally set based on current boat yaw as 
+    \begin{equation}
+        \theta_{\text{sail}} = \frac{\sin(\theta_{aw})}{\cos(\theta_{aw}) + 0.4\cos^2(\theta_{aw})}
+    \end{equation}
+    This is clipped based on sailboat limit.
+
+    \hfill\\
+    The rudder controller is implemented as a PID controller derived from a Jacobian linearization of a simplified dynamics model from input rudder to output yaw.
+    
+    \hfill\\
+    Gains are determined through LQR.
     
 \end{frame}
 
 \begin{frame}{Planner}
     
+    The planner takes in a high level \(x, y\) goal and plans a yaw trajectory for the boat 
+    to reach the goal.
+    
+    \hfill\\
+    We design the planner as repeatedly solving constrained nonlinear optimization problems with receding horizons. Due to model complexity, the planner runs slowly and so we define a 
+    replanning interval on the order of 10s of seconds.
+    
+    \hfill\\
+    Objective: the standard LQR-like quadratic objective with \(Q\) and \(R\) tunable cost matrices.
+    
+    \hfill\\
+    Constraints: planned path must satisfy simplified boat dynamics and avoid obstacles.
+    
+    \hfill\\
+    The optimization problems are solved with Casadi and the IPOPT solver.
+    
 \end{frame}
 
-\begin{frame}{Planner: Boat model}
+\begin{frame}{Planner: Boat Model}
 
+    A simplified boat dynamics model is used in the planner to speed up planning.
+    Also, some information used by the boat dynamics model are not well known 
+    ahead of time.
+    
+    \hfill\\
+    We make a simplified 3 state boat dynamics model with states \(x, y, \psi\) where 
+    \(x, y\) are position and \(\psi\) is heading, and a non-physical input \(u\) 
+    such that 
+    
+    \begin{equation}
+        \mqty[\dot{x} \\ \dot{y} \\ \dot{\psi}]
+         = \mqty[v_x \cos(\psi) - v_y \cos(\psi) \\ 
+         v_x \sin(\psi) + v_y\cos(\psi) \\ 
+         u]
+    \end{equation}
+    Why set yaw as integral of input instead of input itself?
+    \begin{itemize}
+        \item Ensures yaw is continuous.
+        \item Allows limiting rate of change of yaw, ensuring planned path can be tracked.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Planner: Boat Model}
+    Limitations of this boat model:
+    \begin{itemize}
+        \item Velocity model is severely simplified.
+            \begin{itemize}
+                \item We model \(v_x\) and \(v_y\) as constant over the planning horizon and equal to the velocities at the time of planning.
+                \item Attempts at more detailed models such as setting speed as a cardioid based on difference between yaw and wind direction resulted in optimization failing to solve.
+            \end{itemize}
+        \item Model accuracy depends significantly on relative angle between wind and boat heading.
+        \begin{itemize}
+            \item Planner sometimes plans infeasible paths when going against wind.
+        \end{itemize}
+    \end{itemize}
+    
+    \hfill\\
+    Replanning handles deviations from plan due to model mismatch and disturbances.
 \end{frame}
 
 \begin{frame}{Planner: Obstacles}
@@ -251,6 +333,10 @@ This is clipped based on sailboat limit.
 \section{Conclusion}
 
 \begin{frame}{Future Work and Improvements}
+
+\begin{itemize}
+    \item Simplified planner boat dynamics model:
+\end{itemize}
     
 \end{frame}
 
