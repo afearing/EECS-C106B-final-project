@@ -95,7 +95,7 @@ environment: {
     },
     disturbances: {
         wind_strength:   5.0,  # [m/s] 5.0 m/s ~= 4-5 bft
-        wind_direction:  270, # [deg]
+        wind_direction:  45, # [deg]
         waves:          False,   # whether waves are enabled
         wave_direction: 0,  # [deg] 
         wave_length:      100.0,  # [m] 
@@ -107,7 +107,7 @@ simulator: {
     # time controls
     stepsize:          0.1, # [s]  how far into the future to simulate
     clockrate:          10, # [Hz] how often to simulate
-    t_end:              200, # [s] how long to simulate
+    t_end:              300, # [s] how long to simulate
 }
 
 ...

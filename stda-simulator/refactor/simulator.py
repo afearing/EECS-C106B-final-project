@@ -33,16 +33,20 @@ class Simulator:
         rudder_ang_refs = np.zeros((num_steps + 1, 1))
         sail_ang_refs = np.zeros((num_steps + 1, 1))
         yaw_desireds = np.zeros((num_steps + 1, 1))
+        plan_pos = np.zeros((num_steps, 2))
 
 
         for step_i in range(num_steps):
-            print('iteration: ', step_i)
+            if step_i % 10 == 0:
+                print('iteration: ', step_i)
             time = step_i * self.stepsize
             
             # Compute rudder control input
             if self.controller is not None:
                 yaw_desired = self.path.yaw(time)
                 yaw_desireds[step_i] = yaw_desired
+
+                plan_pos[step_i] = self.path.pos(time)
 
                 self.rudder_ang_ref = self.controller.rudder_control(time, yaw_desired, self.boat, self.env)
 
@@ -66,7 +70,7 @@ class Simulator:
             elif self.boat.yaw > np.pi:
                 self.boat.yaw -= 2*np.pi
 
-        return times, boat_states, rudder_ang_refs, sail_ang_refs, yaw_desireds
+        return times, boat_states, rudder_ang_refs, sail_ang_refs, yaw_desireds, plan_pos
 
     def __solve(self, time, boat_state):
         self.boat.set_state(boat_state)
