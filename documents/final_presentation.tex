@@ -16,6 +16,8 @@
 \RequirePackage{sidecap}
 \RequirePackage{caption}
 \RequirePackage{booktabs}
+\RequirePackage{xcolor}
+\definecolor{officeblue}{RGB}{53, 136, 195}
 \captionsetup[figure]{font = scriptsize, labelfont = scriptsize} % https://tex.stackexchange.com/questions/52132/beamer-change-size-of-figure-caption
 \setkeys{Gin}{width=1\linewidth}
 
@@ -74,11 +76,7 @@ Hamza Khawaja
 
 \begin{frame}{Goal}
 
-\begin{enumerate}
-    \item Develop sailboat yaw controller.
-    \item Develop path planner which can navigate channels.
-\end{enumerate}
-Focus on robustness to environmental disturbances.
+Develop planning and control scheme which can take into account environmental disturbances and obstacles such as channels.
 
 \end{frame}
   
@@ -124,29 +122,120 @@ Focus on robustness to environmental disturbances.
 
 \end{frame}
 
-\begin{frame}{6-DoF Model Axes}
+\begin{frame}{6-DoF Model Axes and State Space}
 \begin{columns}
-\column{0.5\linewidth}
+\column{0.4\linewidth}
 \begin{figure}
     \centering
-    \includegraphics[width = \linewidth, height = \textheight, keepaspectratio]{documents/figures/alves}
+    \includegraphics[width = \linewidth, height = \textheight, keepaspectratio]{documents/figures/alves_boat_with_buehler_axes.png}
     \caption{Sailboat axes~\cite{Alves2010}}
-    \label{fig:my_label}
+    \label{fig:sailboat_components}
 \end{figure}
-\column{0.5\linewidth}
-\begin{itemize}
-    \item  \(X_B\)-\(Y\)-\(z\) translation
-    \item Roll \-pitch-yaw rotation
-\end{itemize}
+\begin{tabular}{ll}
+\textcolor{black}{\(\blacksquare\)}& Global frame \\
+     \textcolor{officeblue}{\(\blacksquare\)}& Boat frame 
+\end{tabular}
+\column{0.6\linewidth}
+\begin{table}
+    
+    \centering
+    \begin{tabular}{ccc}
+    name & position & velocity \\
+     &\(x_g\) & \(v_x\) \\
+     &\(y_g\) & \(v_y\) \\
+     &\(z_g\) & \(z_x\) \\
+     heading&\(\psi\) & \(p\) \\
+     \textcolor{officeblue}{roll} & \textcolor{officeblue}{\(\theta\)} & \textcolor{officeblue}{\(q\)} \\
+     \textcolor{officeblue}{pitch}&\textcolor{officeblue}{\(\varphi\)} & \textcolor{officeblue}{\(r\)} \\
+     \textcolor{officeblue}{rudder angle} & \textcolor{officeblue}{\(\rho\)} & \\
+     \textcolor{officeblue}{sail angle}   & \textcolor{officeblue}{\(\gamma\)} & 
+    \end{tabular}
+    \caption{The 14 sailboat state variables~\cite{Buehler2018}.}
+    \label{tab:state_vars}
+\end{table}
+
+
 \end{columns}
 
     
 \end{frame}
 
+\begin{frame}{Dynamics Model}
+
+Position:
+\begin{equation}
+    \dv{t} \mqty(x_g \\ y_g \\ z_g) = \mqty(v_x \cos(\psi) - v_y \sin(\psi) \\ v_x \sin(\psi) + v_y \cos(\psi) \\ v_z)
+\end{equation}
+
+Angles:
+\begin{equation}
+    \dv{t} \mqty(\varphi \\ \theta \\ \psi) \approx \mqty(p \\ \cos(\varphi) q - \sin(\varphi) r \\ \cos(\varphi) r + \sin(\varphi) q)
+\end{equation}
+
+Velocities:
+\begin{equation}
+    m\dv{t}\mathbf{v} = \mathbf{F}
+\end{equation}
+
+Angular Velocities:
+\begin{equation}
+    \dv{t}(\Theta\Omega) = \mathbf{T} = \sum_i r_i \times \mathbf{F}_i
+\end{equation}
+
+Forces and torques are derived from physical interactions of environment, sailboat, sail, and rudder.
+\end{frame}
+
+\begin{frame}{Control Surfaces}
+
+\begin{columns}
+\column{0.4\linewidth}
+\begin{figure}
+    \centering
+    \includegraphics[width = \linewidth]{documents/figures/alves_wing.png}
+    \caption{Drag and lift forces on a foil~\cite{Alves2010}.}
+    \label{fig:alves_foil}
+\end{figure}
 
 
 
-\section{Simulator}
+\column{0.6\linewidth}
+
+Because the boat is moving, foils have \enquote{apparent velocity} in fluid\\\textbf{}
+\begin{equation}
+    \mathbf{V}_{af} = \mathbf{V}_f - \mathbf{V}
+\end{equation}
+\(\mathbf{V}_{af}\) is the apparent velocity of the foil relative to the fluid\\
+\(\mathbf{V}_{f}\) is the velocity of the fluid\\
+\(\mathbf{V}\) is the velocity of the sailboat
+\end{columns}
+\hfill{} \\
+\begin{equation}
+    \mathbf{F}_{\mathrm{flow}} = \frac{1}{2} \rho v_{rel}^2 A \mqty(\sin(\beta) c_L - \cos(\beta) c_D \\ \sin(\beta) c_D + \cos(\beta) c_L\\ 0)
+\end{equation}
+where \(C_L\) and \(C_D\) are lift and drag coefficients, respectively; \(\beta\) is the apparent flow angle; \(A\) is the foil area; and \(\rho\) is the fluid mass density.
+\end{frame}
+
+\begin{frame}{Control Surfaces, continued}
+    \begin{columns}
+    \column{0.4\linewidth}
+    \begin{figure}
+        \centering
+        \includegraphics{documents/figures/alves_sailboat_angles.png}
+        \caption{Control surface angles~\cite{Alves2010}.}
+        \label{fig:my_label}
+    \end{figure}
+    \column{0.6\linewidth}
+    \centerline{Bottom line}
+    \begin{itemize}
+        \item Set set angle to maximize wind force -- use geometry
+        \item Rudder induces moment about \(z)\)-axis -- relies on keel
+    \end{itemize}
+
+    \end{columns}
+    \centerline{\(\therefore\) Only need to control rudder}
+\end{frame}
+
+\subsection{Simulator}
 \begin{frame}{Evaluating Simulators}
     
     
@@ -158,8 +247,8 @@ Focus on robustness to environmental disturbances.
         \begin{itemize}
             \item Ubuntu 16.04 + Kinetic ROS + Gazebo
             \item 6 DoF boat dynamics model.
-            \item Waves, buoyancy, water currents, wind currents, thruster underwater, thruster above water, foil
-            \item Too complicated to work with, hard to extend
+            \item Waves, buoyancy, water currents, wind currents, thruster underwater, thruster above water, foil.
+            \item Too complicated to work with, hard to extend.
         \end{itemize}
     \column{0.5\linewidth}
         \centerline{\texttt{stda-sailboat-sim} \cite{Buehler2018}}
@@ -167,8 +256,9 @@ Focus on robustness to environmental disturbances.
             \item Python + Numpy + Matplotlib
             \item 6 DoF boat dynamics model.
             \item Waves, buoyancy, wind, sail, keel, rudder forces.
-            \item Good enough 
+            \item Good enough .
         \end{itemize}
+
     \end{columns}
     
 \end{frame}
@@ -223,22 +313,18 @@ track the reference heading.
 
 \begin{frame}{Yaw Controller}
 
-    The yaw controller tracks a reference yaw by setting sail and rudder angles.
+    Yaw controller tracks a reference yaw by setting sail and rudder angles.
 
     \hfill\\
-    The yaw controller is implemented as per the same paper which developed the simulator and 
+    Implemented as per the same paper which developed the simulator and 
     boat dynamics model we are using\cite{Buehler2018}.
     
     \hfill\\
-    This controller leverages the fact that there is an optimal angle for the sail based on wind direction to decouple the rudder and sail angle control.
+    This controller leverages the fact that there is an optimal angle for the sail based on wind direction to  the rudder and sail angle control.
     
     \hfill\\
     Note that the inputs called here as `rudder angle' and `sail angle' are actually
-    inputs to a first order model that simulates delays in changing the rudder and sail angles,
-    which are actually boat state variables.
-    
-    \hfill\\
-    
+    inputs to a first order model that simulates delays in changing the rudder and sail angles.
     
 \end{frame}
 
@@ -298,7 +384,7 @@ track the reference heading.
          v_x \sin(\psi) + v_y\cos(\psi) \\ 
          u]
     \end{equation}
-    Why set yaw as integral of input instead of input itself?
+    Set yaw as integral of the pseudo-input instead of setting yaw as the input itself to:
     \begin{itemize}
         \item Ensures yaw is continuous.
         \item Allows limiting rate of change of yaw, ensuring planned path can be tracked.
@@ -316,7 +402,7 @@ track the reference heading.
             \end{itemize}
         \item Model accuracy depends significantly on relative angle between wind and boat heading.
         \begin{itemize}
-            \item Planner sometimes plans infeasible paths when going against wind.
+            \item Planner sometimes outputs bad paths when boat must go against wind.
         \end{itemize}
     \end{itemize}
     
@@ -330,18 +416,120 @@ track the reference heading.
 
 \section{Experiments and Results}
 
+\begin{frame}{Experiment: Sailing with Wind}
+    \begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/with_wind_to_40_40_heading.png}
+         \label{fig:with_wind_heading}
+     \end{subfigure}
+     \begin{subfigure}[b]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/with_wind_to_40_40_speed.png}
+         \label{fig:with_wind_speed}
+     \end{subfigure}
+     \hfill\\
+     \begin{subfigure}[b]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 1cm 1.25cm 1.5cm },clip]{documents/final_pres_figs/with_wind_to_40_40_pos.png}
+         \label{fig:with_wind_pos}
+     \end{subfigure}
+    \caption{Sailing to \((x,y)=(100,40)\) with the wind in direction of sailing.}
+    \label{fig:rstarst}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Experiment: Sailing with Crosswinds}
+    \begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.35\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/right_to_wind_to_40_40_heading.png}
+         \label{fig:right_wind_heading}
+     \end{subfigure}
+     \begin{subfigure}[b]{0.35\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/right_to_wind_to_40_40_speed.png}
+         \label{fig:right_wind_speed}
+     \end{subfigure}
+     \hfill\\
+     \begin{subfigure}[b]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/right_to_wind_to_40_40_pos.png}
+         \label{fig:right_wind_pos}
+     \end{subfigure}
+    \caption{Sailing to \((x,y)=(100,40)\) with the winds cross to direction of sailing.}
+    \label{fig:rstarst}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Experiment: Sailing Against Wind}
+    \begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.33\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/against_wind_to_40_40_heading.png}
+         \label{fig:right_wind_heading}
+     \end{subfigure}
+     \begin{subfigure}[b]{0.33\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/against_wind_to_40_40_speed.png}
+         \label{fig:right_wind_speed}
+     \end{subfigure}
+     \hfill\\
+     \begin{subfigure}[b]{0.4\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 0.0cm 1.25cm 0.5cm },clip]{documents/final_pres_figs/against_wind_to_40_40_pos.png}
+         \label{fig:right_wind_pos}
+     \end{subfigure}
+    \caption{Sailing to \((x,y)=(40,40)\) with the winds against direction of sailing.}
+    \label{fig:rstarst}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Experiment: Planning with Obstacles}
+    without waves.
+    
+    at least show position plan with versus without obstacle.
+\end{frame}
+
+\begin{frame}{Experiment: Planning with Obstacles}
+    with waves
+    
+    show position plan with versus without obstacles, and also show effect of waves with some plot
+\end{frame}
+
+
+
+
 \section{Conclusion}
 
 \begin{frame}{Future Work and Improvements}
 
 \begin{itemize}
-    \item Simplified planner boat dynamics model:
+    \item Improve simplified planner boat dynamics model:
+    \begin{itemize}
+        \item Speed up planner.
+        \item More accurately model boat velocity.
+        \item More accurately model or predict environment (to better handle environmental disturbances).
+    \end{itemize}
 \end{itemize}
     
 \end{frame}
 
 \begin{frame}{Conclusion}
+    In our project we develop and present an optimization-based planner for generating
+    reference headings from high-level position targets, to pass to yaw controllers, which are more developed in literature.
     
+    \hfill\\
+    The optimization-based planner is flexible enough to handle additional constraints such as  obstacle avoidance, and is fast enough to allow for replanning to create a closed-loop planning and control system.
+    
+    \hfill\\
+    Modular design where planner and yaw controller blocks can be switched out.
+    
+    \hfill\\
+    Sailboat simulator library which is modular and usable for testing planners and controllers.
 \end{frame}
 
 \begin{frame}{Thank You}
