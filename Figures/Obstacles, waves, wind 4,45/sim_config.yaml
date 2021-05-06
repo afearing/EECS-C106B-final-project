@@ -1,0 +1,113 @@
+---
+boat: {
+    # Initial state of simulation
+    initial_state: {
+
+        pos_x: 0, # [m]
+        pos_y: 0, # [m]
+        pos_z: 0, # [m]
+
+        vel_x: 0, # [m/s]
+        vel_y: 0, # [m/s]
+        vel_z: 0, # [m/s]
+
+        roll:  0, # maybe radians?
+        pitch: 0,
+        yaw:   0.1,
+
+
+        roll_rate:  0, # maybe radians per second?
+        pitch_rate: 0,
+        yaw_rate:   0,
+        
+        
+        rudder_angle: 1,      # [rad]
+        sail_angle:   0.837, # 48*pi/180     # [rad]
+    },
+    boat_dimensions: {
+
+        sail_pressure_point_height: 2.48, # [m]
+        sail_height:                 6.2, # [m]
+        sail_area:                   6.4, # [m^2]
+        sail_length:                   1, # [m]
+        sail_stretching:           0.961,
+        rudder_stretching: 2.326923076923077, 
+        rudder_blade_area:                    0.13,  # [m^2]
+        keel_height:      0.55, # [m]
+        keel_length:         2, # [m]
+        keel_stretching: 0.605,
+
+
+        length:             4, # [m]
+        mass:             350, # [kg]
+        height_bouyancy: 0.15, # [m]
+        lateral_area:     2.5, # [m^2]
+        waterline_area:   1.6, # [m^2]
+
+        # cog: center of gravity
+        distance_cog_sail_pressure_point:  0.43, # [m]
+        distance_cog_keel_pressure_point:  0.24, # [m]
+        distance_cog_rudder:               1.24, # [m]
+        distance_mast_sail_pressure_point: 0.68, # [m]
+
+        # moi: moment of inertia
+        geometrical_moi_x: 0.256,
+        geometrical_moi_y: 25.6,
+        moi_x: 25.6,
+        moi_y: 1600,
+        moi_z: 1066,
+
+        roll_damping:      0.25,
+        pitch_damping:     0.25,
+        damping_z:          0.2,
+        yaw_timeconstant:     5,
+        along_damping:       15,
+        transverse_damping:   5,
+        hull_speed:         2.5,
+
+        # limits
+        max_rudder_angle: 0.261799388, # 15*pi/180
+        max_rudder_speed: 0.104719755, # pi/30
+        max_sail_speed: 0.314159265, # pi/10
+        sail_sampletime: 2, # i have no idea why this is a thing
+        limit_wind_speed: 6, # used to calculate sail angle
+        stall_deg: 14 # used to calculate sail angle
+    },
+    controller: { 
+        speed_adaptation: 0.3,
+        sail_sampletime: 2 # sample time for the sail controller? like every 5th timestep or something idk
+    #     KP: 0.5,  # calculated in controller class
+    #     KI: 0.1,  # calculated in controller class
+    #     KD: 0.9   # calculated in controller class
+    }
+
+}
+
+
+environment: {
+    properties: {
+        water_viscosity: 0.0000001, # [Pa * s]
+        air_viscosity:   0.0000171, # [Pa * s]
+        water_density:        1000, # [kg/m^3]
+        air_density:           1.3, # [kg/m^3]
+        gravity:              9.81,  # [m/s^2]
+
+    },
+    disturbances: {
+        wind_strength:   5.0,  # [m/s] 5.0 m/s ~= 4-5 bft
+        wind_direction:  45.0, # [deg] wind from north-north-east
+        waves:          True,   # whether waves are enabled
+        wave_direction: 0,  # [deg] keep for the future
+        wave_length:      100.0,  # [m] 
+        wave_amplitude:   0.5,  # [m] 
+    },
+}
+
+simulator: {
+    # time controls
+    stepsize:          0.1, # [s]  how far into the future to simulate
+    clockrate:          10, # [Hz] how often to simulate
+    t_end:              200, # [s] how long to simulate
+}
+
+...
