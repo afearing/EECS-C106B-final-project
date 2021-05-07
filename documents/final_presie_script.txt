@@ -1,2 +1,42 @@
 Slide 1:
-Intro
+Hello everyone. Neelay, Hamza, and I are going to talk to you about our project: autonomous control of a sailboat.
+
+Slide 2:
+First we're going to give you some background on the problem we're trying solve. Then we'll explain a little bit about our model and simulation. Then we'll talk about our controller implementation and show the results of our experiments. We'll conclude with some ideas for future work and a summary of what we did.
+
+Slide 3:
+So why autonomous sailboats? One application is low-power long-term deployment on the ocean. Since a sailboat needs actuators only for the sail and rudder, it could run on solar power without docking to refuel.
+Sailboats also present an interesting controls problem, since they are very dependent on the environment for motion. Additionally, there are environmental disturbances such as wind, water currents, and waves to worry about.
+
+Slide 4:
+So our goal for this project is to develop a planning an control scheme that is robust to environmental disturbances and can navigate a channel. We don't want our sailboat to end get stuck.
+
+Slide 5:
+First a little bit about sailing. There are three modes of sailing, as you can see in the left figure. Which one to use depends on the wind direction. To head into the wind, you take on tacking motion. To head with the wind, you take on a jibbing motion. When you're crossing the wind, then you can head straight.
+The right figure shows the velocities that the sailboat can reach for different headings relative to the wind. To move against the wind, you want the boat facing about 60 or 300 degrees to maximize the velocity component going into the wind. And then you want 120 or 240 degrees to go with the wind.
+
+Slide 6:
+We're using a boat model that we found in the literature. The main things to worry about are the sail and rudder, which we can set the angles of within a limited range. We're dealing with a single sail.
+
+Slide 7:
+Here is our state space model for our boat. We have the typical X Y Z translation, then we also have the heading, roll, pitch, and yaw. And then we have state variables for the rudder angle and sail angle.
+
+Slide 8:
+Real quick we have a dynamics model. Not too special, since we've seen stuff like this before. The forces are derived from the physical interactions of the hull, sail, rudder, and keel with the environment.
+
+Slide 9:
+The sailboat has three foils: the keel, the rudder, and the sail. I'm not a mechanical engineer, so we're not going to go into too much detail about these. The interesting part is that because the sailboat is moving, we have to deal with the "apparent velocity" of the wind and water relative to the boat when we're calculating forces.
+
+Slide 10:
+So the control surface math comes down to this main point: we can use geometry to set the sail to maximize force from the wind, then use the rudder to steer. So we only need to worry about controlling the rudder on our sailboat.
+
+Slide 11:
+For our simulator, we went with a Python simulator because it was easy to work with. 6 DoF.  No visualization, but looks good enough.
+
+
+
+Slide 10:
+Briefly
+
+Slide 11:
+Explain only need to control the rudder angle
