@@ -37,18 +37,18 @@
  \tableofcontents
 \end{frame}
 \section{Introduction}
-\begin{frame}{Team}
+% \begin{frame}{Team}
+% 
+% Neelay Junnarkar
+% 
+% \hfill\\
+% Andrew Fearing
+% 
+% \hfill\\
+% Hamza Khawaja
+% \end{frame}
 
-Neelay Junnarkar
-
-\hfill\\
-Andrew Fearing
-
-\hfill\\
-Hamza Khawaja
-\end{frame}
-
-
+\subsection{Background}
 \begin{frame}{Motivation}
 \begin{columns}
 \column{0.5\linewidth}
@@ -59,17 +59,20 @@ Hamza Khawaja
         \label{fig:boat_stuck}
     \end{figure}  
 \column{0.5\linewidth}
-    \textbf{Control of sailboats}
-    
-    \hfill\\
-    Controlling boats autonomously presents an interesting challenge due to the large effect of environmental disturbances such as wind, water currents, and waves. 
-    
-    \hfill\\
     \textbf{Why Sailboats?}
     
     \hfill\\
     Sailboats are useful for low-power long-term deployments. Also, present a gap in current literature,
     especially in controller design.
+    \\
+\hfill\\
+    \textbf{Control of sailboats}
+    
+    \hfill\\
+    Controlling boats autonomously presents an interesting challenge due to the large effect of environmental disturbances such as wind, water currents, and waves. 
+    
+    
+
     
 \end{columns}
 \end{frame}
@@ -228,7 +231,7 @@ where \(C_L\) and \(C_D\) are lift and drag coefficients, respectively; \(\beta\
     \centerline{Bottom line}
     \begin{itemize}
         \item Set set angle to maximize wind force -- use geometry
-        \item Rudder induces moment about \(z)\)-axis -- relies on keel
+        \item Rudder induces moment about \(z)\) - axis -- relies on keel
     \end{itemize}
 
     \end{columns}
@@ -265,15 +268,15 @@ where \(C_L\) and \(C_D\) are lift and drag coefficients, respectively; \(\beta\
 
 
 
-\begin{frame}{Refactoring Simulator}
-
-    \texttt{stda-sailboat-sim} simulator appears to have been written just enough to satisfy the needs of the authors paper.
-    
-    \hfill\\
-    We rewrote it significantly to modularize the code and allow easy and structured definition
-    of controllers and path planners.
-
-\end{frame}
+% \begin{frame}{Refactoring Simulator}
+% 
+%     \texttt{stda-sailboat-sim} simulator appears to have been written just enough to satisfy the needs of the authors paper.
+%     
+%     \hfill\\
+%     We rewrote it significantly to modularize the code and allow easy and structured definition
+%     of controllers and path planners.
+% 
+% \end{frame}
 
 % \begin{frame}{Simulation Results}
 % \begin{table}[h]
@@ -411,11 +414,85 @@ track the reference heading.
 \end{frame}
 
 \begin{frame}{Planner: Obstacles}
+We utilize convex casadi constraints to model "spherical" obstacles. Each circle with x-position, \(x_obj\) and y-position, \(y_{obj}\) and radius, \(r_{obj}\). Then the constraint equation for each obstacle, where : 
+\begin{equation}
+        (x - x_{obj})^2 + (y-y_{obj})^2 >= r_{obj}^2
+    \end{equation}
+    
+The radius \(r_{obj}\) used above is more than the actual radius of the obstacle to avoid collision.
 
+    \hfill\\
+The modeling makes creating objects easier than other polygons and custom shapes. Some real-life objects that sail boats can interact with, e.g buoys, can be modeled using "spheres"
+\end{frame}
+
+\begin{frame}{Planner: Obstacles}
+Limitations of this Obstacle model: 
+\begin{itemize}
+        \item Obstacle model is simplified.
+            \begin{itemize}
+                \item Modeling real-life objects as circles can be inaccurate, especially when the shapes are highly non-convex.
+                
+                \item Trying to emulate different shapes using circles increases computation time and can be infeasible if a large number of objects are being considered.
+                \end{itemize}
+\end{itemize}
+\begin{itemize}
+        \item Obstacle model is not completely practical
+            \begin{itemize}
+                \item The obstacles modelled are stationary, which is usually not the case in dynamic oceanic environments
+                \end{itemize}
+\end{itemize}
 \end{frame}
 
 \section{Experiments and Results}
 
+\begin{frame}{Experiments: Obstacle planning, no waves}
+    The following experiments were run with a planning horizon of 50 seconds and a replanning interval of 50 seconds. Positions are plotted below. 
+    
+    
+    \begin{figure}
+     \centering
+      \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 2cm 1.5cm 2.5cm },clip]{Figures/no-obstacle-no-waves-wind-5-10/position.png}
+         \caption{No obstacle}
+         \label{fig:no_obstacle_no_waves}
+     \end{subfigure}
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 1cm 0.75cm 2.5cm },clip]{Figures/Obstacles-waves-wind-4-45/obsta.png}
+         \caption{One obstacle}
+         \label{fig:obstacle_no_waves}
+     \end{subfigure}
+    
+     \hfill\\
+     
+    \caption{Sailing to \((x,y)=(100,40)\) with the wind in direction of sailing. No waves.}
+    \label{fig:sail_with_wind}
+\end{figure}
+    
+\end{frame}
+
+
+\begin{frame}{Experiment: Obstacles with waves}
+    \begin{figure}
+     \centering
+      \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 2cm 1.25cm 2.5cm },clip]{Figures/no-obstacle-waves-wind-5-65/position.png}
+         \caption{No obstacles}
+         \label{fig:no_obstacle_waves}
+     \end{subfigure}
+     \begin{subfigure}[b]{0.49\textwidth}
+         \centering
+         \includegraphics[width=\textwidth,trim={0.5cm 2cm 1.25cm 2.5cm },clip]{Figures/Obstacles-waves-wind-4-45/position-(with-waves).png}
+         \caption{Two obstacles}
+         \label{fig:obstacles_waves}
+     \end{subfigure}
+    
+    \caption{Sailing to \((x,y)=(100,40)\) with the wind in direction of sailing. 0.5m Waves included.}
+    \label{fig:sail_with_wind}
+\end{figure}
+\end{frame}
 \begin{frame}{Experiment: Sailing with Wind}
     \begin{figure}
      \centering
@@ -435,8 +512,8 @@ track the reference heading.
          \includegraphics[width=\textwidth,trim={0.5cm 1cm 1.25cm 1.5cm },clip]{documents/final_pres_figs/with_wind_to_40_40_pos.png}
          \label{fig:with_wind_pos}
      \end{subfigure}
-    \caption{Sailing to \((x,y)=(100,40)\) with the wind in direction of sailing.}
-    \label{fig:rstarst}
+    \caption{Sailing to \((x,y)=(100,40)\) with the wind in direction of sailing. No waves.}
+    \label{fig:sail_with_wind}
 \end{figure}
 \end{frame}
 
@@ -459,8 +536,8 @@ track the reference heading.
          \includegraphics[width=\textwidth,trim={0.5cm 0.25cm 1.25cm 0.75cm },clip]{documents/final_pres_figs/right_to_wind_to_40_40_pos.png}
          \label{fig:right_wind_pos}
      \end{subfigure}
-    \caption{Sailing to \((x,y)=(100,40)\) with the winds cross to direction of sailing.}
-    \label{fig:rstarst}
+    \caption{Sailing to \((x,y)=(100,40)\) with the winds cross to direction of sailing. No waves.}
+    \label{fig:sail_crosswind}
 \end{figure}
 \end{frame}
 
@@ -483,22 +560,22 @@ track the reference heading.
          \includegraphics[width=\textwidth,trim={0.5cm 0.0cm 1.25cm 0.5cm },clip]{documents/final_pres_figs/against_wind_to_40_40_pos.png}
          \label{fig:right_wind_pos}
      \end{subfigure}
-    \caption{Sailing to \((x,y)=(40,40)\) with the winds against direction of sailing.}
-    \label{fig:rstarst}
+    \caption{Sailing to \((x,y)=(40,40)\) with the winds against direction of sailing. No waves.}
+    \label{fig:sail_against_wind}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Experiment: Planning with Obstacles}
-    without waves.
+% \begin{frame}{Experiment: Planning with Obstacles}
+%     without waves.
     
-    at least show position plan with versus without obstacle.
-\end{frame}
+%     at least show position plan with versus without obstacle.
+% \end{frame}
 
-\begin{frame}{Experiment: Planning with Obstacles}
-    with waves
+% \begin{frame}{Experiment: Planning with Obstacles}
+%     with waves
     
-    show position plan with versus without obstacles, and also show effect of waves with some plot
-\end{frame}
+%     show position plan with versus without obstacles, and also show effect of waves with some plot
+% \end{frame}
 
 
 
@@ -514,6 +591,11 @@ track the reference heading.
         \item More accurately model boat velocity.
         \item More accurately model or predict environment (to better handle environmental disturbances).
     \end{itemize}
+    \item Expand obstacle model to support:
+        \begin{itemize}
+            \item More complex geometries.
+            \item Simple dynamics like drifting in water.
+        \end{itemize}
 \end{itemize}
     
 \end{frame}
