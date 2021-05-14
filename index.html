@@ -1,0 +1,98 @@
+</<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <title> Autonomous Sailboating </title>
+  </head>
+  <body>
+<h4>Project Overview </h4>
+<p>
+  <b>
+  (a) Think of this as your project pitch.
+  (b) Describe the end goal of your project and what makes it interesting.
+  (c) In what real-world robotics applications could the work from your project be useful?
+  </b>
+
+<img id="boats" src="images/boats.png" alt="" width="800px">
+<div id="boats-text"> Fig 1: USVsim graphical representation of boats </div>
+<p>
+We want to get a sailboat (a type of Unmanned Surface Vehicle, or USV) through a canal autonomously. The maneuver
+will be performed in a simulation environment with simulated wind as the propellant for the
+USV. Environmental disturbances (water currents) will also be an important factor. This work has useful implications because it
+allows the deployment of navigating,
+energy-efficient and green-energy sailing boats that can withstand some environmental disturbances and only use
+abundant wind energy to propel themselves. These boats could be used in sea monitoring, oceanic measurement, as drifting databuouys,
+as survey ships etc. This can reduce expenses and reduce deployment time, and increase data resolution.
+
+<h4> Implementation and Results </h4>
+<p>
+  <b>
+  (a) Provide a summary of approach and hardware/setup used. Illustrate this with a diagram
+  and/or flow chart.
+  (b) Summarize software used and written. Provide links to code used.
+  (c) Provide a link to your report.
+  (d) Include pictures or videos of your system working (or failing).
+  </b>
+<p>
+<img id="controller" src="images/controller.PNG" alt="" width="800">
+<div id="controller-text"> Fig 2: Block diagram of planner and controller </div>
+
+The maneuver will be performed in stda-sailboat-sim simulation environment, with simulated wind as the
+propellant for the USV. Environmental disturbances (water currents) are also be an important factor.
+
+
+<p> We use code from stda-sailboat-sim to simulate environmental disturbances: https://github.com/disaster-robotics-proalertas/usv_sim_lsa
+  such as waves.
+
+<h4> Conclusion </h4>
+<p>
+  <b>
+  (a) Summarize your results, difficulties encountered, things you would have changed, and
+  possible future directions.
+  </b>
+<p>
+The simulation was run in several different cases. Waves,obstacles, and different wind vectors were
+ used. The tests were not exhaustive due to the wide variety of environmental conditions possible at sea
+  and also due to the limitations of the simulator. An experiment was deemed successful if the sailboat got
+   close to the target position.
+
+<div id="images">
+   <img src="images/with_wind_to_40_40_heading.png" width= "300px" alt="">
+   <img src="images/with_wind_to_40_40_pos.png" width= "300px" alt="">
+   <img src="images/with_wind_to_40_40_speed.png" width= "300px" alt="">
+</div>
+
+   The results demonstrated that the planner was largely successful. Passages as narrow as 4 meters were navigated through. Any narrower gaps
+   caused the planner to return an infeasible path. We used:
+   <ul>
+     <li> Single Obstacle To demonstrate that the path planning and control scheme worked,
+    the target position was set to(100,40,π/4) with wind the in the direction of the intended heading, shown in Fig.3.
+    The wind had a magnitude of18 023 481 908 m/s. The boat was able to sail around the obstacle. </li>
+      <li> ChannelBecause the
+    obstacle avoidance worked without a dis-turbance, waves were added to the channel traversal experiment  </li>
+    <li> CrosswindsThe path planner was then tested with different wind directionsThe experiment was run with a
+    different wind direction.Note that the sailboat overshoots the target. This was deemed acceptable because
+     stopping a sailboat at a point is another issue </li>
+
+<h4> Team Bios </h4>
+<p>
+<b>(a) Names and short bios of each member of your group</b>
+<div class="team">
+<div id="neelay"> <img src="images/neelay.jpg" alt="Neelay's picture" width= "200px">
+<div id=neelay-desc> <b>Neelay</b> is a 4th year undergraduate in EECS, and hastaken courses such as EE 128, 221A/222, and
+  (of course)EECS 106A.
+  His interests are primarily related to controland motion planning</div></div>
+<div id="hamza"> <img src="images/hamza.jpg" alt="" width="200px"> <div id=hamza-desc>
+  <b>Hamza</b> is a 4th year undergraduate in EECS. He hastaken EECS106A,and EECS126. His interests in roboticsare in
+   machine learning/ artificial intelligence and dynamically responsive, maneuverable robotic
+   systems with a spice  of eﬀiciency/optimization</div></div>
+
+<div id="andrew"><img src="images/andrew.jpg" width="200px" alt=""><div id=andrew-desc><b>Andrew</b> is a 4th year undergraduate in EECS. He hastaken EE 120, EE C128, and
+EECS C106A. His interests in robotics are in micro-scale mobile robots.</div></div>
+ </div>
+
+  </body>
+</html>
