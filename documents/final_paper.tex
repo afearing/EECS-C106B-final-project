@@ -27,16 +27,16 @@
 
 
 \begin{abstract}
-In this project we develop a planning and control method for a sailboat to maneuver autonomously, in the presence of obstacles, to a high level target described in \(x, y\) coordinates. We test our method in the \Sim simulator against various wind directions and with and without presence of waves. 
+In this project we develop a planning and control method for a sailboat to maneuver autonomously, in the presence of obstacles, to a high level target described in \(x, y\) coordinates. We test our method in the \Sim against various wind directions and with and without presence of waves. 
 \end{abstract}
 
 
 \section{Introduction}
+Wind-propelled sailing is a complex task. The sailboat is entirely dependent on the wind and water for propulsion and steering. In addition, boats are subject to environmental disturbances such as wind gusts, water currents, and waves. Because of this, autonomous sailing presents an interesting problem in robotics.
+
 Sailboats have the potential to go on long-term missions at sea. They need actuators only for the rudder and sail, and so they can be solar powered. Possible uses include plastic waste collection, coastal surveillance, and long-term data collection.
 
-Sailboats present an interesting vehicle challenge because they depend on the environment for propulsion and steering. In addition, boats are subject to environmental disturbances such as wind gusts, water currents, and waves.
-
-In particular, we wanted to investigate the capability of a sailboat to traverse a channel because boats getting stuck is bad. To accomplish this, we applied a planner with a replanning loop to a simulated sailboat.
+In this paper, we present an application of an optimization-based path planner to successfully navigate the simulated sailboat to a target position in the presence of obstacles and under different environmental conditions. In particular, we demonstrate the sailboat succesfully traversing a narrow channel. The sailboat dimensions, kinematics, and dynamics model is given in \cite{Buehler2018}. Our approach uses a simple PID controller for rudder control. The sail angle for propulsion is set using a closed-form function of the apparent wind angle.
 
 % \begin{figure}
 %     \centering
@@ -56,9 +56,12 @@ In particular, we wanted to investigate the capability of a sailboat to traverse
 \section{Related Work}
 Interest in autonomous sailboats has grown over the past decade. There are several different areas of research in pursuit of sailing USV's, including propulsion, control, navigation , and simulation.
 
-Efforts in propulsion research \cite{Saoud2015, Setiawan2019, DosSantos2020} focus on optimizing the sail angle and shape. There are several criteria that can be evaluated, such as time to target, energy consumption, safety, and aerodynamic forces.
+
 % \cite{Cruz2010, Erckens2010, Xiao2014, Santos2016, Santos2018, HelmiAbrougui2019}
+
 Previous research in model-based sailboat control have used PID controllers for heading, such as in \cite{Cruz2010, Erckens2010}. \cite{Xiao2014} used a nonlinear heading controller using the integrator backstepping method. \cite{Santos2018} used a lookup table of PI parameters to suit the control requirements of different environmental conditions.
+
+Efforts in propulsion research \cite{Saoud2015, Setiawan2019, DosSantos2020} focus on optimizing the sail angle and shape. There are several criteria that can be evaluated, such as time to target, energy consumption, safety, and aerodynamic forces.
 
 % path planning \cite{Sauze2010, Petres2011, Plumet2013}
 There are several methods that have been used for autonomous sailboat path planning. A*, theta*, and D* algorithms have previously been successful \cite{Erckens2010}. Path planning using potential fields is promising. They offer a way to unify the navigation factors (goal, obstacles, boat characteristics, costs of maneuvers) into a single framework \cite{Plumet2013}. 
@@ -67,7 +70,7 @@ One area of that has not found much attention is robustness to environmental eff
 
 % \cite{Buehler2018, Paravisi2019, Setiawan2020}
 
-In this paper, we present an application of an optimization-based path planner to successfully navigate the simulated sailboat to a target position in the presence of obstacles and under different environmental conditions. The sailboat kinematics and dynamics model is given in \cite{Buehler2018}. Our approach uses a simple PID controller for rudder control. The sail angle for propulsion is set using a closed-form function of the apparent wind angle.
+
 
 
 
@@ -259,10 +262,13 @@ The planner, with the parameters as given, usually completes a plan in 1-5 secon
 
 \section{Conclusion}
 We have demonstrated a method for path planning and obstacle avoidance of a sailboat using an optimization-based planner. The planner is flexible enough to allow the sailboat to traverse a channel and avoid obstacles under different environmental conditions, such as different wind directions and the presence of waves.
+
+Although we used the \Sim for simplicity, we encountered several of its limitations. The simulator uses a constant wind vector, so we were unable to test gusts of wind. Robustness to extreme weather, such as high winds, would be another goal. Successfully traversing a narrow channel with high winds would be challenging, especially if the wind were not steady.
+
+
 % \section{Future Work}
 % The \Sim has some limitations. Foremost is that has not been verified to accurately model real-world sailing. In terms of environmental disturbances, it does not support varying wind. We were not able to try wind gusts and strange water currents. Additionally, more testing would be helpful. More conditions, different sized boats, moving obstacles.
 
-% i'm cutting future work because i think this paper is supposed to be presented as "a contribution to the field", rather than a report of all the stuff we would totally do if we had more time
 \bibliographystyle{IEEEtran}
 \bibliography{refs.bib}
 \end{document}
