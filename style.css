@@ -47,6 +47,20 @@ h4 {
   justify-content: space-around;
 }
 
+#obstacles #images {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#obstacles p {
+  font-size: 18px;
+  text-align: center;
+  transform: translateY(-50px);
+  margin-left: 5%;
+  margin-right: 5%;
+}
 
 #neelay, #hamza, #andrew {
   display: flex;
