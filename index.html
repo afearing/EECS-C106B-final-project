@@ -8,6 +8,10 @@
     <title> Autonomous Sailboating </title>
   </head>
   <body>
+    <div id="menu">
+      Simulated Control and Path Planning of an Autonomous Sailboat
+    </div>
+    
 <h4>Project Overview </h4>
 
 We want to get a sailboat (a type of Unmanned Surface Vehicle, or USV) through a canal autonomously. The maneuver
@@ -31,10 +35,10 @@ as survey ships etc. This can reduce expenses and reduce deployment time, and in
 <img id="controller" src="images/controller.PNG" alt="" width="800">
 <div id="controller-text"> Fig 2: Block diagram of planner and controller </div>
 
-Our control design modularizes the system into two stages: a planner, which takes in high level <i>x,y</i> position 
-targets and generates heading trajectories, and a yaw controller, which generates sail and rudder angles 
-to track the reference heading trajectory output by the planner. Since the planning stage does not need 
-to be run at the same rate as the yaw controller due to the slow speed of the boat, we create an inner feedback loop between the yaw controller and the system dynamics, and an outer feedback loop that incorporates the planner and is run at a lower rate. 
+Our control design modularizes the system into two stages: a planner, which takes in high level <i>x,y</i> position
+targets and generates heading trajectories, and a yaw controller, which generates sail and rudder angles
+to track the reference heading trajectory output by the planner. Since the planning stage does not need
+to be run at the same rate as the yaw controller due to the slow speed of the boat, we create an inner feedback loop between the yaw controller and the system dynamics, and an outer feedback loop that incorporates the planner and is run at a lower rate.
 Our paper can be found <a href="https://github.com/afearing/EECS-C106B-final-project/blob/main/documents/EECS_C106B_final_project.pdf">here</a>. <p> Our code is based on that of <a href="https://github.com/simonkohaut/stda-sailboat-simulator">
   stda-sailboat-simulator</a>. This simulator uses RK45 to solve an ODE of the sailboat dynamics over time.
 <div id = "images">
