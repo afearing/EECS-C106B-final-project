@@ -1,0 +1,40 @@
+body {
+  font-family: Roboto, sans-serif;
+  margin-top: 100px;
+  width: 90%;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+h4 {
+  text-align: center;
+  font-size: 30px;
+}
+#boats, #controller {
+  margin-top: 50px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#controller {
+  margin-bottom: 10px;
+}
+
+
+#boats-text, #controller-text {
+  font-size: 18px;
+  text-align: center;
+  margin-bottom:  20px;
+}
+
+#controller-text {
+  transform: translateY(-50px);
+}
+
+#images {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
