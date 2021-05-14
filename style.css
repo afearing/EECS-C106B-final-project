@@ -46,3 +46,17 @@ h4 {
   flex-direction: row;
   justify-content: space-around;
 }
+
+
+#neelay, #hamza, #andrew {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: justify;
+  margin-bottom: 30px;
+}
+
+#neelay-desc, #hamza-desc, #andrew-desc {
+  margin-left: 40px;
+  max-width: 400px;
+}
