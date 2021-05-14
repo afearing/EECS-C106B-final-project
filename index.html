@@ -13,7 +13,12 @@
     </div>
 
 <h4>Project Overview </h4>
-
+<!-- <p>
+  <b>
+  (a) Think of this as your project pitch.
+  (b) Describe the end goal of your project and what makes it interesting.
+  (c) In what real-world robotics applications could the work from your project be useful?
+  </b> -->
 We want to get a sailboat (a type of Unmanned Surface Vehicle, or USV) through a canal autonomously. The maneuver
 will be performed in a simulation environment with simulated wind as the propellant for the
 USV. Environmental disturbances (water currents) will also be an important factor. This work has useful implications because it
@@ -33,6 +38,7 @@ as survey ships etc. This can reduce expenses and reduce deployment time, and in
   </b>
 <p> -->
 <img id="controller" src="images/controller.PNG" alt="" width="800">
+<!-- <iframe src="documents/final_pres_figs/controller_block_diagram.pdf" ></iframe> -->
 <div id="controller-text"> Fig 2: Block diagram of planner and controller </div>
 
 Our control design modularizes the system into two stages: a planner, which takes in high level <i>x,y</i> position
@@ -41,9 +47,16 @@ to track the reference heading trajectory output by the planner. Since the plann
 to be run at the same rate as the yaw controller due to the slow speed of the boat, we create an inner feedback loop between the yaw controller and the system dynamics, and an outer feedback loop that incorporates the planner and is run at a lower rate.
 Our paper can be found <a href="https://github.com/afearing/EECS-C106B-final-project/blob/main/documents/EECS_C106B_final_project.pdf">here</a>. <p> Our code is based on that of <a href="https://github.com/simonkohaut/stda-sailboat-simulator">
   stda-sailboat-simulator</a>. This simulator uses RK45 to solve an ODE of the sailboat dynamics over time.
-<div id = "images">
-<img src="Figures/Obstacles-waves-wind-4-45/position-(with-waves).png" width= "300px" alt="">
+<div id="obstacles">
+  <div id="images">
+     <img src="Figures/Obstacles-waves-wind-4-45/obsta.png" width= "500px"alt="">
+     <img src="Figures/Obstacles-waves-wind-4-45/position-(with-waves).png" width= "500px" alt="">
+  </div>
+  <p> Single obstacle avoidance to reach(100,40) with wind in the direction of sailing and no waves [LEFT]
+     Channel navigation to reach(100, 40) with wind in the direction of sailing and 0.5 m waves [RIGHT]
 </div>
+
+
 Using the above path planner and controller, our simulated sailboat successfully traversed a channel to reach the target point (100, 40) with 0.5m waves. Note that the wind is blowing in the direction of sailing.
 
 <p> </p>
@@ -54,15 +67,15 @@ Using the above path planner and controller, our simulated sailboat successfully
   possible future directions.
   </b>
 <p> -->
-The simulation was run in several different cases. Waves,obstacles, and different wind vectors were
+The simulation was run in several different cases. Waves, obstacles, and different wind vectors were
  used. The tests were not exhaustive due to the wide variety of environmental conditions possible at sea
   and also due to the limitations of the simulator. An experiment was deemed successful if the sailboat got
    close to the target position.
 
 <div id="images">
-   <img src="images/with_wind_to_40_40_heading.png" width= "300px" alt="">
-   <img src="images/with_wind_to_40_40_pos.png" width= "300px" alt="">
-   <img src="images/with_wind_to_40_40_speed.png" width= "300px" alt="">
+   <img src="documents/final_pres_figs/with_wind_to_40_40_heading.png" width= "300px" alt="">
+   <img src="documents/final_pres_figs/with_wind_to_40_40_pos.png" width= "300px" alt="">
+   <img src="documents/final_pres_figs/with_wind_to_40_40_speed.png" width= "300px" alt="">
 </div>
 
    The results demonstrated that the planner was largely successful. Passages as narrow as 4 meters were navigated through. Any narrower gaps
@@ -72,7 +85,7 @@ The simulation was run in several different cases. Waves,obstacles, and differen
     the target position was set to(100,40,π/4) with wind the in the direction of the intended heading, shown in Fig.3.
     The wind had a magnitude of18 023 481 908 m/s. The boat was able to sail around the obstacle. </li>
       <li> ChannelBecause the
-    obstacle avoidance worked without a dis-turbance, waves were added to the channel traversal experiment  </li>
+    obstacle avoidance worked without a disturbance, waves were added to the channel traversal experiment  </li>
     <li> CrosswindsThe path planner was then tested with different wind directionsThe experiment was run with a
     different wind direction.Note that the sailboat overshoots the target. This was deemed acceptable because
      stopping a sailboat at a point is another issue </li>
