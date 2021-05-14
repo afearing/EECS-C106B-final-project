@@ -68,12 +68,21 @@ The simulation was run in several different cases. Waves,obstacles, and differen
    The results demonstrated that the planner was largely successful. Passages as narrow as 4 meters were navigated through. Any narrower gaps
    caused the planner to return an infeasible path. We used:
    <ul>
-     <li> Single Obstacle To demonstrate that the path planning and control scheme worked,
+
+
+     <li>  <b> Sailing with wind </b> To demonstrate that the path planning and con-trol  scheme worked,  the  target  position  was set
+        to (100,40,π/4) with wind the in the direction of the intended heading, shown in Fig.3. The wind had amagnitude of5 m/s. </li>
+     <li>  <b> Sailing with crosswind </b> In this experiment, the wind is changed to point at−45degrees, roughly at a right angle to
+       the straight linetrajectory from start to goal. See Figure 4. </li>
+     <li> <b> Sailing against Wind </b> In this experiment, the wind points at−135 degrees, andthe goal state is(x,y) = (40,40). This
+       poses an interestingproblem since in the real dynamics model there is a nullwhen the boat is heading directly into the wind where
+       the boat has a speed of 0. </li>
+     <li> <b> Single Obstacle: </b> To demonstrate that the path planning and control scheme worked,
     the target position was set to(100,40,π/4) with wind the in the direction of the intended heading, shown in Fig.3.
     The wind had a magnitude of18 023 481 908 m/s. The boat was able to sail around the obstacle. </li>
-      <li> ChannelBecause the
+      <li> <b>Channel: </b> Because the
     obstacle avoidance worked without a dis-turbance, waves were added to the channel traversal experiment  </li>
-    <li> CrosswindsThe path planner was then tested with different wind directionsThe experiment was run with a
+    <li> <b>Crosswinds: </b> The path planner was then tested with different wind directionsThe experiment was run with a
     different wind direction.Note that the sailboat overshoots the target. This was deemed acceptable because
      stopping a sailboat at a point is another issue </li>
 
@@ -89,7 +98,7 @@ The simulation was run in several different cases. Waves,obstacles, and differen
        <b>Hamza</b> is a 4th year undergraduate in EECS. He has taken EECS106A,and EECS126. His interests in robotics are in
         machine learning/ artificial intelligence and dynamically responsive, maneuverable robotic
         systems with a spice  of eﬀiciency/optimization</div></div>
-     
+
      <div id="andrew"><img src="images/andrew.jpg" width="200px" alt=""><div id=andrew-desc><b>Andrew</b> is a 4th year undergraduate in EECS. He has taken EE 120, EE C128, and
      EECS C106A. His interests in robotics are in micro-scale mobile robots.</div></div>
       </div>
