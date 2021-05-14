@@ -19,7 +19,7 @@ abundant wind energy to propel themselves. These boats could be used in sea moni
 as survey ships etc. This can reduce expenses and reduce deployment time, and increase data resolution.
 
 <h4> Implementation and Results </h4>
-<p>
+<!-- <p>
   <b>
   (a) Provide a summary of approach and hardware/setup used. Illustrate this with a diagram
   and/or flow chart.
@@ -27,25 +27,29 @@ as survey ships etc. This can reduce expenses and reduce deployment time, and in
   (c) Provide a link to your report.
   (d) Include pictures or videos of your system working (or failing).
   </b>
-<p>
+<p> -->
 <img id="controller" src="images/controller.PNG" alt="" width="800">
 <div id="controller-text"> Fig 2: Block diagram of planner and controller </div>
 
-The maneuver will be performed in stda-sailboat-sim simulation environment, with simulated wind as the
-propellant for the USV. Environmental disturbances (water currents) are also be an important factor.
-Our paper can be found <a href="https://github.com/afearing/EECS-C106B-final-project/blob/main/documents/EECS_C106B_final_project.pdf">here</a>.
+Our control design modularizes the system into two stages: a planner, which takes in high level <i>x,y</i> position 
+targets and generates heading trajectories, and a yaw controller, which generates sail and rudder angles 
+to track the reference heading trajectory output by the planner. Since the planning stage does not need 
+to be run at the same rate as the yaw controller due to the slow speed of the boat, we create an inner feedback loop between the yaw controller and the system dynamics, and an outer feedback loop that incorporates the planner and is run at a lower rate. 
+Our paper can be found <a href="https://github.com/afearing/EECS-C106B-final-project/blob/main/documents/EECS_C106B_final_project.pdf">here</a>. <p> Our code is based on that of <a href="https://github.com/simonkohaut/stda-sailboat-simulator">
+  stda-sailboat-simulator</a>. This simulator uses RK45 to solve an ODE of the sailboat dynamics over time.
+<div id = "images">
+<img src="Figures/Obstacles-waves-wind-4-45/position-(with-waves).png" width= "300px" alt="">
+</div>
+Using the above path planner and controller, our simulated sailboat successfully traversed a channel to reach the target point (100, 40) with 0.5m waves. Note that the wind is blowing in the direction of sailing.
 
-
-<p> We use code from stda-sailboat-sim to simulate environmental disturbances: https://github.com/disaster-robotics-proalertas/usv_sim_lsa
-  such as waves.
 <p> </p>
 <h4> Conclusion </h4>
-<p>
+<!-- <p>
   <b>
   (a) Summarize your results, difficulties encountered, things you would have changed, and
   possible future directions.
   </b>
-<p>
+<p> -->
 The simulation was run in several different cases. Waves,obstacles, and different wind vectors were
  used. The tests were not exhaustive due to the wide variety of environmental conditions possible at sea
   and also due to the limitations of the simulator. An experiment was deemed successful if the sailboat got
